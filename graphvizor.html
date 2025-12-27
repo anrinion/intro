@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <title>Graphviz Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/editor/editor.main.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <script type="module">
+        import { Graphviz } from "https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js";
+        window.graphviz = await Graphviz.load();
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .toolbar {
+            background: linear-gradient(to right, #1e293b, #334155);
+            padding: 12px 16px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            border-bottom: 1px solid #475569;
+            flex-shrink: 0;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 8px;
+            padding-right: 16px;
+            border-right: 1px solid #475569;
+        }
+
+        .toolbar-group:last-child {
+            border-right: none;
+            margin-left: auto;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #475569 0%, #334155 100%);
+        }
+
+        .btn.secondary:hover {
+            box-shadow: 0 4px 8px rgba(71, 85, 105, 0.4);
+        }
+
+        .btn.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .editor-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #475569;
+            min-width: 0;
+            transition: all 0.3s ease;
+            background: #1e293b;
+        }
+
+        .editor-pane.hidden {
+            flex: 0;
+            min-width: 0;
+            border-right: none;
+        }
+
+        #editor {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        .preview-pane {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 20px;
+            min-width: 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .preview-pane.hidden {
+            flex: 0;
+            min-width: 0;
+            padding: 0;
+        }
+
+        .preview-content {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .preview-content svg {
+            cursor: pointer;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .error {
+            color: #f87171;
+            padding: 20px;
+            text-align: center;
+            background: rgba(248, 113, 113, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+
+        .toggle-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #475569 0%, #334155 100%);
+            border: none;
+            width: 32px;
+            height: 64px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            z-index: 100;
+            transition: all 0.2s ease;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-btn:hover {
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            width: 36px;
+        }
+
+        .toggle-btn.left {
+            left: 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .toggle-btn.right {
+            right: 0;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .toggle-btn.hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+
+            .editor-pane {
+                border-right: none;
+                border-bottom: 1px solid #475569;
+                max-height: 50vh;
+            }
+
+            .editor-pane.hidden {
+                max-height: 0;
+                border-bottom: none;
+            }
+
+            .preview-pane {
+                flex: 1;
+            }
+
+            .toolbar {
+                flex-wrap: wrap;
+                padding: 10px 12px;
+            }
+
+            .toolbar-group {
+                border-right: none;
+                padding-right: 8px;
+            }
+
+            .btn {
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+
+            .toggle-btn {
+                width: 64px;
+                height: 32px;
+                top: auto;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .toggle-btn.left {
+                bottom: 0;
+                border-radius: 8px 8px 0 0;
+            }
+
+            .toggle-btn.right {
+                top: 0;
+                border-radius: 0 0 8px 8px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .btn {
+                padding: 12px 24px;
+                font-size: 15px;
+            }
+        }
+
+        .status {
+            padding: 6px 16px;
+            font-size: 13px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            background: rgba(71, 85, 105, 0.3);
+            border-radius: 6px;
+        }
+
+        .status.success {
+            color: #34d399;
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            padding: 32px 64px;
+            border-radius: 16px;
+            z-index: 1000;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            font-size: 18px;
+        }
+
+        .modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            min-width: 360px;
+            padding: 24px;
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            padding: 24px;
+            border-radius: 12px;
+            min-width: 320px;
+            max-width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #f1f5f9;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0f172a;
+            border: 1px solid #475569;
+            color: #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-content input:focus, .modal-content select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .modal-content label {
+            display: block;
+            margin-bottom: 6px;
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .hint {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .hint.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">Loading Graphviz...</div>
+    
+    <div class="container" style="display: none;" id="app">
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <button class="btn secondary" id="exportSvg">Export SVG</button>
+                <button class="btn secondary" id="exportPng">Export PNG</button>
+            </div>
+            
+            <div class="toolbar-group">
+                <button class="btn secondary" id="changeDirection">Direction</button>
+                <button class="btn secondary" id="changeLines">Lines</button>
+                <button class="btn secondary" id="colorize">Colors</button>
+            </div>
+            
+            <div class="toolbar-group">
+                <button class="btn" id="addNode">+ Node</button>
+                <button class="btn" id="addEdge">+ Edge</button>
+            </div>
+            
+            <div class="status" id="status">Ready</div>
+        </div>
+        
+        <div class="content">
+            <button class="toggle-btn left" id="toggleLeft">›</button>
+            <button class="toggle-btn right" id="toggleRight">‹</button>
+            
+            <div class="editor-pane" id="editorPane">
+                <div id="editor"></div>
+            </div>
+            
+            <div class="preview-pane" id="previewPane">
+                <div class="hint" id="hint"></div>
+                <div class="preview-content" id="previewContent"></div>
+                
+                <div class="modal" id="nodeModal">
+                    <div class="modal-content">
+                        <h3 id="nodeModalTitle">Add Node</h3>
+                        
+                        <label>Node Name</label>
+                        <input type="text" id="nodeNameInput" placeholder="e.g. Start">
+                        
+                        <label>Shape</label>
+                        <select id="nodeShapeSelect">
+                            <option value="box">Rectangle (box)</option>
+                            <option value="circle">Circle</option>
+                            <option value="ellipse">Ellipse</option>
+                            <option value="diamond">Diamond</option>
+                            <option value="plaintext">Text (plaintext)</option>
+                            <option value="triangle">Triangle</option>
+                        </select>
+                        
+                        <div class="modal-buttons">
+                            <button class="btn secondary" id="nodeModalCancel">Cancel</button>
+                            <button class="btn" id="nodeModalOk">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+        
+        let editor;
+        let currentSvg = '';
+        let graphvizReady = false;
+        let edgeMode = false;
+        let firstNode = null;
+        let nodeElements = new Map();
+        let viewMode = 'split'; // 'split', 'code', 'preview'
+
+        require(['vs/editor/editor.main'], function() {
+            monaco.languages.register({ id: 'dot' });
+            
+            monaco.languages.setMonarchTokensProvider('dot', {
+                keywords: [
+                    'digraph', 'graph', 'node', 'edge', 'subgraph', 'strict'
+                ],
+                attributes: [
+                    'label', 'shape', 'color', 'style', 'fillcolor', 'fontsize',
+                    'fontname', 'penwidth', 'arrowhead', 'arrowtail', 'dir',
+                    'rankdir', 'splines', 'bgcolor', 'fontcolor', 'width', 'height'
+                ],
+                shapes: [
+                    'box', 'circle', 'ellipse', 'diamond', 'plaintext', 'point',
+                    'triangle', 'invtriangle', 'polygon', 'record', 'Mrecord'
+                ],
+                tokenizer: {
+                    root: [
+                        [/[a-zA-Z_]\w*/, {
+                            cases: {
+                                '@keywords': 'keyword',
+                                '@attributes': 'attribute',
+                                '@shapes': 'type',
+                                '@default': 'identifier'
+                            }
+                        }],
+                        [/"([^"\\]|\\.)*$/, 'string.invalid'],
+                        [/"/, 'string', '@string'],
+                        [/->|--/, 'operator'],
+                        [/[{}()\[\]]/, '@brackets'],
+                        [/[;,=]/, 'delimiter'],
+                        [/\/\/.*$/, 'comment'],
+                        [/\/\*/, 'comment', '@comment'],
+                        [/\d+(\.\d+)?/, 'number']
+                    ],
+                    string: [
+                        [/[^\\"]+/, 'string'],
+                        [/"/, 'string', '@pop']
+                    ],
+                    comment: [
+                        [/[^\/*]+/, 'comment'],
+                        [/\*\//, 'comment', '@pop'],
+                        [/[\/*]/, 'comment']
+                    ]
+                }
+            });
+
+            monaco.editor.defineTheme('dot-dark', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                    { token: 'keyword', foreground: 'C586C0', fontStyle: 'bold' },
+                    { token: 'attribute', foreground: '9CDCFE' },
+                    { token: 'type', foreground: '4EC9B0' },
+                    { token: 'identifier', foreground: 'D4D4D4' },
+                    { token: 'string', foreground: 'CE9178' },
+                    { token: 'number', foreground: 'B5CEA8' },
+                    { token: 'comment', foreground: '6A9955' },
+                    { token: 'operator', foreground: 'D4D4D4' }
+                ],
+                colors: {
+                    'editor.background': '#1e293b'
+                }
+            });
+
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: `digraph G {
+    rankdir=LR;
+    node [style=rounded];
+    
+    Start [shape=circle];
+    Process [shape=box];
+    Decision [shape=diamond];
+    End [shape=circle];
+    
+    Start -> Process;
+    Process -> Decision;
+    Decision -> End [label="Yes"];
+    Decision -> Process [label="No"];
+}`,
+                language: 'dot',
+                theme: 'dot-dark',
+                minimap: { enabled: false },
+                fontSize: 14,
+                lineNumbers: 'on',
+                scrollBeyondLastLine: false,
+                automaticLayout: true
+            });
+
+            editor.onDidChangeModelContent(() => {
+                clearTimeout(window.renderTimeout);
+                window.renderTimeout = setTimeout(renderGraph, 500);
+            });
+        });
+
+        const checkGraphviz = setInterval(() => {
+            if (window.graphviz && editor) {
+                clearInterval(checkGraphviz);
+                graphvizReady = true;
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').style.display = 'flex';
+                renderGraph();
+            }
+        }, 100);
+
+        const preview = document.getElementById('previewContent');
+        const status = document.getElementById('status');
+        const hint = document.getElementById('hint');
+        const editorPane = document.getElementById('editorPane');
+        const previewPane = document.getElementById('previewPane');
+        const toggleLeft = document.getElementById('toggleLeft');
+        const toggleRight = document.getElementById('toggleRight');
+
+        function setStatus(text, success = true) {
+            status.textContent = text;
+            status.className = success ? 'status success' : 'status';
+        }
+
+        function showHint(text, duration = 2000) {
+            hint.textContent = text;
+            hint.classList.add('show');
+            setTimeout(() => hint.classList.remove('show'), duration);
+        }
+
+        function updateViewMode(mode) {
+            viewMode = mode;
+            
+            if (mode === 'code') {
+                editorPane.classList.remove('hidden');
+                previewPane.classList.add('hidden');
+                toggleLeft.classList.add('hidden');
+                toggleRight.classList.remove('hidden');
+                toggleRight.textContent = '›';
+            } else if (mode === 'preview') {
+                editorPane.classList.add('hidden');
+                previewPane.classList.remove('hidden');
+                toggleLeft.classList.remove('hidden');
+                toggleLeft.textContent = '‹';
+                toggleRight.classList.add('hidden');
+            } else {
+                editorPane.classList.remove('hidden');
+                previewPane.classList.remove('hidden');
+                toggleLeft.classList.remove('hidden');
+                toggleLeft.textContent = '‹';
+                toggleRight.classList.remove('hidden');
+                toggleRight.textContent = '›';
+            }
+        }
+
+        toggleLeft.addEventListener('click', () => {
+            if (viewMode === 'split') {
+                updateViewMode('preview');
+            } else if (viewMode === 'preview') {
+                updateViewMode('split');
+            }
+        });
+
+        toggleRight.addEventListener('click', () => {
+            if (viewMode === 'split') {
+                updateViewMode('code');
+            } else if (viewMode === 'code') {
+                updateViewMode('split');
+            }
+        });
+
+        function parseGraph(dotCode) {
+            const nodes = new Map();
+            const edges = [];
+            const lines = dotCode.split('\n');
+            
+            for (const line of lines) {
+                const edgeMatch = line.match(/(\w+)\s*(?:->|--)\s*(\w+)/);
+                if (edgeMatch) {
+                    const [, from, to] = edgeMatch;
+                    edges.push({ from, to });
+                    if (!nodes.has(from)) nodes.set(from, { in: 0, out: 0 });
+                    if (!nodes.has(to)) nodes.set(to, { in: 0, out: 0 });
+                    nodes.get(from).out++;
+                    nodes.get(to).in++;
+                }
+                
+                const nodeMatch = line.match(/^\s*(\w+)\s*(?:\[|;)/);
+                if (nodeMatch && !nodes.has(nodeMatch[1])) {
+                    nodes.set(nodeMatch[1], { in: 0, out: 0 });
+                }
+            }
+            
+            return { nodes, edges };
+        }
+
+        function getNodeColor(inEdges, outEdges) {
+            if (inEdges === 0 && outEdges > 0) return 'lightblue';
+            if (inEdges > 0 && outEdges === 0) return 'lightcoral';
+            if (inEdges === outEdges && inEdges > 0) return 'lightgreen';
+            if (inEdges > outEdges) return 'lightyellow';
+            if (outEdges > inEdges) return 'plum';
+            return 'lightgray';
+        }
+
+        function getNodeShape(nodeName) {
+            const code = editor.getValue();
+            const regex = new RegExp(`${nodeName}\\s*\\[([^\\]]+)\\]`);
+            const match = code.match(regex);
+            if (match) {
+                const shapeMatch = match[1].match(/shape\s*=\s*(\w+)/);
+                if (shapeMatch) return shapeMatch[1];
+            }
+            return 'box';
+        }
+
+        async function renderGraph() {
+            if (!graphvizReady) return;
+
+            const code = editor.getValue().trim();
+            if (!code) {
+                preview.innerHTML = '<div class="error">Enter DOT code to visualize</div>';
+                return;
+            }
+
+            try {
+                currentSvg = await window.graphviz.dot(code);
+                preview.innerHTML = currentSvg;
+                setStatus('Rendered');
+                attachNodeHandlers();
+            } catch (e) {
+                preview.innerHTML = `<div class="error">Error: ${e.message}</div>`;
+                setStatus('Error', false);
+            }
+        }
+
+        function attachNodeHandlers() {
+            nodeElements.clear();
+            const svg = preview.querySelector('svg');
+            if (!svg) return;
+
+            const nodes = svg.querySelectorAll('.node');
+            nodes.forEach(node => {
+                const title = node.querySelector('title');
+                if (!title) return;
+                
+                const nodeName = title.textContent.trim();
+                nodeElements.set(nodeName, node);
+
+                node.style.cursor = 'pointer';
+                node.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    handleNodeClick(nodeName);
+                });
+            });
+        }
+
+        function handleNodeClick(nodeName) {
+            if (edgeMode) {
+                if (!firstNode) {
+                    firstNode = nodeName;
+                    showHint(`Selected: ${nodeName}. Click second node`);
+                } else {
+                    addEdgeToCode(firstNode, nodeName);
+                    firstNode = null;
+                    edgeMode = false;
+                    document.getElementById('addEdge').classList.remove('active');
+                }
+            } else {
+                editNode(nodeName);
+            }
+        }
+
+        function editNode(nodeName) {
+            const modal = document.getElementById('nodeModal');
+            const input = document.getElementById('nodeNameInput');
+            const shapeSelect = document.getElementById('nodeShapeSelect');
+            const title = document.getElementById('nodeModalTitle');
+            
+            title.textContent = `Edit: ${nodeName}`;
+            input.value = nodeName;
+            shapeSelect.value = getNodeShape(nodeName);
+            modal.classList.add('show');
+            input.focus();
+
+            const handleOk = () => {
+                const newName = input.value.trim();
+                const newShape = shapeSelect.value;
+                
+                if (newName) {
+                    let code = editor.getValue();
+                    
+                    if (newName !== nodeName) {
+                        const regex = new RegExp(`\\b${nodeName}\\b`, 'g');
+                        code = code.replace(regex, newName);
+                    }
+                    
+                    const nodeDefRegex = new RegExp(`${newName}\\s*\\[([^\\]]*)\\]`);
+                    const match = code.match(nodeDefRegex);
+                    
+                    if (match) {
+                        const attrs = match[1];
+                        const hasShape = attrs.match(/shape\s*=\s*\w+/);
+                        
+                        if (hasShape) {
+                            code = code.replace(nodeDefRegex, `${newName} [${attrs.replace(/shape\s*=\s*\w+/, `shape=${newShape}`)}]`);
+                        } else {
+                            code = code.replace(nodeDefRegex, `${newName} [shape=${newShape}, ${attrs}]`);
+                        }
+                    } else {
+                        const lines = code.split('\n');
+                        const nodeLineIndex = lines.findIndex(l => new RegExp(`\\b${newName}\\b`).test(l) && !l.includes('['));
+                        
+                        if (nodeLineIndex >= 0) {
+                            lines[nodeLineIndex] = lines[nodeLineIndex].replace(new RegExp(`\\b${newName}\\b`), `${newName} [shape=${newShape}]`);
+                            code = lines.join('\n');
+                        } else {
+                            const lastBrace = lines.findIndex(l => l.includes('}'));
+                            if (lastBrace > 0) {
+                                lines.splice(lastBrace, 0, `    ${newName} [shape=${newShape}];`);
+                                code = lines.join('\n');
+                            }
+                        }
+                    }
+                    
+                    editor.setValue(code);
+                    setStatus('Updated');
+                }
+                modal.classList.remove('show');
+                cleanup();
+            };
+
+            const handleCancel = () => {
+                modal.classList.remove('show');
+                cleanup();
+            };
+
+            const cleanup = () => {
+                document.getElementById('nodeModalOk').removeEventListener('click', handleOk);
+                document.getElementById('nodeModalCancel').removeEventListener('click', handleCancel);
+                input.removeEventListener('keypress', handleEnter);
+            };
+
+            const handleEnter = (e) => {
+                if (e.key === 'Enter') handleOk();
+            };
+
+            document.getElementById('nodeModalOk').addEventListener('click', handleOk);
+            document.getElementById('nodeModalCancel').addEventListener('click', handleCancel);
+            input.addEventListener('keypress', handleEnter);
+        }
+
+        document.getElementById('addNode').addEventListener('click', () => {
+            const modal = document.getElementById('nodeModal');
+            const input = document.getElementById('nodeNameInput');
+            const shapeSelect = document.getElementById('nodeShapeSelect');
+            const title = document.getElementById('nodeModalTitle');
+            
+            title.textContent = 'Add Node';
+            input.value = '';
+            shapeSelect.value = 'box';
+            modal.classList.add('show');
+            input.focus();
+
+            const handleOk = () => {
+                const name = input.value.trim();
+                const shape = shapeSelect.value;
+                
+                if (name) {
+                    const code = editor.getValue();
+                    const lines = code.split('\n');
+                    const lastBrace = lines.findIndex(l => l.includes('}'));
+                    if (lastBrace > 0) {
+                        lines.splice(lastBrace, 0, `    ${name} [shape=${shape}];`);
+                        editor.setValue(lines.join('\n'));
+                        setStatus('Node added');
+                    }
+                }
+                modal.classList.remove('show');
+                cleanup();
+            };
+
+            const handleCancel = () => {
+                modal.classList.remove('show');
+                cleanup();
+            };
+
+            const cleanup = () => {
+                document.getElementById('nodeModalOk').removeEventListener('click', handleOk);
+                document.getElementById('nodeModalCancel').removeEventListener('click', handleCancel);
+                input.removeEventListener('keypress', handleEnter);
+            };
+
+            const handleEnter = (e) => {
+                if (e.key === 'Enter') handleOk();
+            };
+
+            document.getElementById('nodeModalOk').addEventListener('click', handleOk);
+            document.getElementById('nodeModalCancel').addEventListener('click', handleCancel);
+            input.addEventListener('keypress', handleEnter);
+        });
+
+        document.getElementById('addEdge').addEventListener('click', () => {
+            edgeMode = !edgeMode;
+            firstNode = null;
+            const btn = document.getElementById('addEdge');
+            
+            if (edgeMode) {
+                btn.classList.add('active');
+                showHint('Select start node from preview');
+                setStatus('Select start node');
+            } else {
+                btn.classList.remove('active');
+                showHint('Edge mode cancelled');
+                setStatus('Ready');
+            }
+        });
+
+        function addEdgeToCode(from, to) {
+            const code = editor.getValue();
+            const lines = code.split('\n');
+            const lastBrace = lines.findIndex(l => l.includes('}'));
+            
+            if (lastBrace > 0) {
+                lines.splice(lastBrace, 0, `    ${from} -> ${to};`);
+                editor.setValue(lines.join('\n'));
+                setStatus(`Edge added: ${from} -> ${to}`);
+            }
+        }
+
+        // --- Graph Manipulation Tools ---
+
+        document.getElementById('changeDirection').addEventListener('click', () => {
+            let code = editor.getValue();
+            const directions = ['LR', 'TB', 'RL', 'BT'];
+            const currentDirMatch = code.match(/rankdir\s*=\s*(\w+)/);
+            let nextDir = 'TB';
+
+            if (currentDirMatch) {
+                const current = currentDirMatch[1];
+                const idx = directions.indexOf(current);
+                nextDir = directions[(idx + 1) % directions.length];
+                code = code.replace(/rankdir\s*=\s*\w+/, `rankdir=${nextDir}`);
+            } else {
+                // Insert after opening brace
+                code = code.replace(/({\s*)/, `$1\n    rankdir=${nextDir};`);
+            }
+            
+            editor.setValue(code);
+            showHint(`Direction: ${nextDir}`);
+        });
+
+        document.getElementById('changeLines').addEventListener('click', () => {
+            let code = editor.getValue();
+            const splines = ['ortho', 'curved', 'polyline', 'spline'];
+            const currentMatch = code.match(/splines\s*=\s*(\w+)/);
+            let nextSpline = 'ortho';
+
+            if (currentMatch) {
+                const current = currentMatch[1];
+                const idx = splines.indexOf(current);
+                nextSpline = splines[(idx + 1) % splines.length];
+                code = code.replace(/splines\s*=\s*\w+/, `splines=${nextSpline}`);
+            } else {
+                code = code.replace(/({\s*)/, `$1\n    splines=${nextSpline};`);
+            }
+
+            editor.setValue(code);
+            showHint(`Lines: ${nextSpline}`);
+        });
+
+        document.getElementById('colorize').addEventListener('click', () => {
+            let code = editor.getValue();
+            const { nodes } = parseGraph(code);
+            
+            // First, remove existing fillcolors to reset
+            code = code.replace(/,?\s*style\s*=\s*filled/g, '');
+            code = code.replace(/,?\s*fillcolor\s*=\s*"[^"]+"/g, '');
+            // clean up empty brackets or double commas if any (simple cleanup)
+            code = code.replace(/\[\s*,/g, '[');
+            
+            // Apply new colors
+            let lines = code.split('\n');
+            nodes.forEach((stats, nodeName) => {
+                const color = getNodeColor(stats.in, stats.out);
+                
+                // Find line defining the node
+                const regex = new RegExp(`\\b${nodeName}\\b\\s*\\[([^\\]]*)\\]`);
+                
+                let found = false;
+                for(let i=0; i<lines.length; i++) {
+                    if (lines[i].match(regex)) {
+                        lines[i] = lines[i].replace(regex, (match, attrs) => {
+                            const separator = attrs.trim() ? ', ' : '';
+                            return `${nodeName} [${attrs}${separator}style=filled, fillcolor="${color}"]`;
+                        });
+                        found = true;
+                        break;
+                    }
+                }
+                
+                // If node definition not found (implicit node), add it
+                if (!found) {
+                    const lastBrace = lines.findIndex(l => l.includes('}'));
+                    if (lastBrace > 0) {
+                        lines.splice(lastBrace, 0, `    ${nodeName} [style=filled, fillcolor="${color}"];`);
+                    }
+                }
+            });
+            
+            editor.setValue(lines.join('\n'));
+            showHint('Nodes colored by connectivity');
+        });
+
+        // --- Export Tools ---
+
+        document.getElementById('exportSvg').addEventListener('click', () => {
+            if (!currentSvg) return;
+            const blob = new Blob([currentSvg], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'graph.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('exportPng').addEventListener('click', () => {
+            if (!currentSvg) return;
+            
+            const img = new Image();
+            const blob = new Blob([currentSvg], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                // Scale up for better quality
+                const scale = 2; 
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.scale(scale, scale);
+                ctx.drawImage(img, 0, 0);
+                
+                const pngUrl = canvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.href = pngUrl;
+                a.download = 'graph.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+            
+            img.src = url;
+        });
+
+        // --- Window Resize Handling ---
+        
+        window.addEventListener('resize', () => {
+            if (editor) {
+                editor.layout();
+            }
+        });
+        
+        // Also trigger layout when toggling panels
+        [toggleLeft, toggleRight].forEach(btn => {
+            btn.addEventListener('click', () => {
+                setTimeout(() => {
+                    if (editor) editor.layout();
+                }, 305); // slightly longer than CSS transition
+            });
+        });
+
+    </script>
+</body>
+</html>
