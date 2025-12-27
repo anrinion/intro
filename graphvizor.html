@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="theme-color" content="#0f172a">
     <title>Graphviz Editor</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/editor/editor.main.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script type="module">
         import { Graphviz } from "https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js";
         window.graphviz = await Graphviz.load();
@@ -16,6 +17,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -25,76 +27,111 @@
             overflow: hidden;
             height: 100vh;
             width: 100vw;
+            touch-action: pan-x pan-y;
         }
 
+        /* Loading Screen */
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            gap: 20px;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #3b82f6;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Main Container */
         .container {
             display: flex;
             flex-direction: column;
             height: 100vh;
+            width: 100vw;
         }
 
-        .toolbar {
+        /* Header */
+        .header {
             background: linear-gradient(to right, #1e293b, #334155);
             padding: 12px 16px;
             display: flex;
-            gap: 16px;
+            justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #475569;
             flex-shrink: 0;
-            overflow-x: auto;
-            flex-wrap: nowrap;
+            z-index: 100;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
 
-        .toolbar-group {
-            display: flex;
-            gap: 8px;
-            padding-right: 16px;
-            border-right: 1px solid #475569;
-        }
-
-        .toolbar-group:last-child {
-            border-right: none;
-            margin-left: auto;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 600;
             color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo i {
+            color: #3b82f6;
+        }
+
+        /* View Tabs */
+        .view-tabs {
+            display: flex;
+            background: #1e293b;
+            border-bottom: 1px solid #475569;
+            flex-shrink: 0;
+            z-index: 90;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            background: transparent;
             border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-size: 14px;
+            color: #94a3b8;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
-            white-space: nowrap;
-            flex-shrink: 0;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+        .tab.active {
+            color: white;
+            background: #0f172a;
         }
 
-        .btn:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #3b82f6;
         }
 
-        .btn.secondary {
-            background: linear-gradient(135deg, #475569 0%, #334155 100%);
-        }
-
-        .btn.secondary:hover {
-            box-shadow: 0 4px 8px rgba(71, 85, 105, 0.4);
-        }
-
-        .btn.active {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
+        /* Content Area */
         .content {
             flex: 1;
             display: flex;
@@ -102,57 +139,128 @@
             position: relative;
         }
 
+        /* Editor Pane */
         .editor-pane {
             flex: 1;
             display: flex;
             flex-direction: column;
-            border-right: 1px solid #475569;
-            min-width: 0;
-            transition: all 0.3s ease;
             background: #1e293b;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
         }
 
         .editor-pane.hidden {
-            flex: 0;
-            min-width: 0;
-            border-right: none;
+            display: none;
         }
 
         #editor {
             flex: 1;
             width: 100%;
             height: 100%;
+            overflow: auto;
         }
 
+        .CodeMirror {
+            height: 100%;
+            font-size: 15px;
+            font-family: 'Fira Code', 'Monaco', monospace;
+            line-height: 1.5;
+        }
+
+        /* Mobile Code Toolbar */
+        .mobile-code-toolbar {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            background: #334155;
+            border-top: 1px solid #475569;
+            overflow-x: auto;
+            flex-shrink: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .code-btn {
+            padding: 10px 14px;
+            background: #475569;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .code-btn:hover {
+            background: #3b82f6;
+        }
+
+        .code-btn i {
+            margin-right: 6px;
+        }
+
+        /* Preview Pane */
         .preview-pane {
             flex: 1;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: auto;
+            flex-direction: column;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            padding: 20px;
-            min-width: 0;
-            position: relative;
-            transition: all 0.3s ease;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
         }
 
         .preview-pane.hidden {
-            flex: 0;
-            min-width: 0;
-            padding: 0;
+            display: none;
+        }
+
+        .preview-controls {
+            padding: 12px;
+            display: flex;
+            gap: 10px;
+            background: #334155;
+            border-bottom: 1px solid #475569;
+            flex-shrink: 0;
+        }
+
+        .preview-btn {
+            padding: 10px 16px;
+            background: #475569;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preview-btn:hover {
+            background: #3b82f6;
         }
 
         .preview-content {
-            max-width: 100%;
-            max-height: 100%;
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
         }
 
         .preview-content svg {
-            cursor: pointer;
+            max-width: 100%;
+            max-height: 100%;
             filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
         }
 
+        /* Error Display */
         .error {
             color: #f87171;
             padding: 20px;
@@ -160,367 +268,808 @@
             background: rgba(248, 113, 113, 0.1);
             border-radius: 8px;
             border: 1px solid rgba(248, 113, 113, 0.3);
+            margin: 20px;
         }
 
-        .toggle-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: linear-gradient(135deg, #475569 0%, #334155 100%);
-            border: none;
-            width: 32px;
-            height: 64px;
-            border-radius: 0 8px 8px 0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-            z-index: 100;
-            transition: all 0.2s ease;
-            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .toggle-btn:hover {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-            width: 36px;
-        }
-
-        .toggle-btn.left {
-            left: 0;
-            border-radius: 0 8px 8px 0;
-        }
-
-        .toggle-btn.right {
-            right: 0;
-            border-radius: 8px 0 0 8px;
-        }
-
-        .toggle-btn.hidden {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            .content {
-                flex-direction: column;
-            }
-
-            .editor-pane {
-                border-right: none;
-                border-bottom: 1px solid #475569;
-                max-height: 50vh;
-            }
-
-            .editor-pane.hidden {
-                max-height: 0;
-                border-bottom: none;
-            }
-
-            .preview-pane {
-                flex: 1;
-            }
-
-            .toolbar {
-                flex-wrap: wrap;
-                padding: 10px 12px;
-            }
-
-            .toolbar-group {
-                border-right: none;
-                padding-right: 8px;
-            }
-
-            .btn {
-                padding: 8px 14px;
-                font-size: 13px;
-            }
-
-            .toggle-btn {
-                width: 64px;
-                height: 32px;
-                top: auto;
-                left: 50%;
-                transform: translateX(-50%);
-            }
-
-            .toggle-btn.left {
-                bottom: 0;
-                border-radius: 8px 8px 0 0;
-            }
-
-            .toggle-btn.right {
-                top: 0;
-                border-radius: 0 0 8px 8px;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .btn {
-                padding: 12px 24px;
-                font-size: 15px;
-            }
-        }
-
-        .status {
-            padding: 6px 16px;
-            font-size: 13px;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            background: rgba(71, 85, 105, 0.3);
-            border-radius: 6px;
-        }
-
-        .status.success {
-            color: #34d399;
-        }
-
-        .loading {
+        /* Bottom Action Bar */
+        .action-bar {
             position: fixed;
-            top: 50%;
+            bottom: 20px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            padding: 32px 64px;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 16px;
+            border: 1px solid #475569;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             z-index: 1000;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-            font-size: 18px;
+            transition: all 0.3s ease;
         }
 
-        .modal {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
+        .action-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            font-size: 20px;
+            display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .action-btn.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #475569 0%, #334155 100%);
+            box-shadow: 0 4px 8px rgba(71, 85, 105, 0.3);
+        }
+
+        .action-btn.large {
+            width: 64px;
+            height: 64px;
+            font-size: 24px;
+        }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 320px;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid #475569;
             z-index: 2000;
-            min-width: 360px;
-            padding: 24px;
-            border-radius: 16px;
-            backdrop-filter: blur(8px);
+            transition: right 0.3s ease;
+            padding: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .modal.show {
+        .side-menu.open {
+            right: 0;
+        }
+
+        .menu-header {
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #475569;
         }
 
-        .modal-content {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            padding: 24px;
-            border-radius: 12px;
-            min-width: 320px;
-            max-width: 90%;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        .menu-section {
+            margin-bottom: 25px;
         }
 
-        .modal-content h3 {
-            margin-bottom: 20px;
-            color: #f1f5f9;
-            font-size: 20px;
+        .menu-section h3 {
+            color: #94a3b8;
+            font-size: 14px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
         }
 
-        .modal-content input, .modal-content select {
+        .menu-btn {
             width: 100%;
-            padding: 10px 12px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-btn:hover {
+            background: #334155;
+            border-color: #3b82f6;
+        }
+
+        .menu-btn i {
+            width: 20px;
+            color: #3b82f6;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        /* Mobile Modal */
+        .mobile-modal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #1e293b;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            z-index: 2001;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            padding: 20px;
+            padding-bottom: 40px;
+            max-height: 90vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .mobile-modal.open {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #475569;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px;
             background: #0f172a;
             border: 1px solid #475569;
-            color: #e2e8f0;
             border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 14px;
+            color: white;
+            font-size: 16px;
             transition: all 0.2s ease;
         }
 
-        .modal-content input:focus, .modal-content select:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        .modal-content label {
-            display: block;
-            margin-bottom: 6px;
-            color: #94a3b8;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .modal-buttons {
+        .modal-actions {
             display: flex;
             gap: 12px;
-            justify-content: flex-end;
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
-        .hint {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+        .modal-btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn.primary {
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
-            padding: 12px 24px;
+        }
+
+        .modal-btn.secondary {
+            background: #475569;
+            color: white;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 14px 24px;
             border-radius: 8px;
             font-size: 14px;
             opacity: 0;
-            transition: opacity 0.3s ease;
             pointer-events: none;
-            z-index: 100;
+            z-index: 3000;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
         }
 
-        .hint.show {
+        .toast.show {
             opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .zoom-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(5px);
+            border: 1px solid #475569;
+            color: white;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(59, 130, 246, 0.9);
+        }
+
+        /* Service Worker Status */
+        .offline-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 4000;
+            display: none;
+        }
+
+        .offline-status.offline {
+            background: #f87171;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 769px) {
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+            
+            .view-tabs {
+                display: none;
+            }
+            
+            .content {
+                flex-direction: row;
+            }
+            
+            .editor-pane, .preview-pane {
+                display: flex !important;
+                width: 50%;
+            }
+            
+            .action-bar {
+                position: absolute;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .mobile-code-toolbar {
+                display: none;
+            }
+            
+            .side-menu {
+                width: 380px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 12px;
+            }
+            
+            .logo {
+                font-size: 1.1rem;
+            }
+            
+            .action-bar {
+                bottom: 10px;
+                padding: 10px;
+            }
+            
+            .action-btn {
+                width: 52px;
+                height: 52px;
+            }
+            
+            .action-btn.large {
+                width: 56px;
+                height: 56px;
+            }
+            
+            .side-menu {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .zoom-controls {
+                top: 10px;
+                right: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mobile-code-toolbar {
+                padding: 8px;
+                gap: 6px;
+            }
+            
+            .code-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            .action-bar {
+                bottom: 5px;
+                padding: 8px;
+            }
+            
+            .action-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 18px;
+            }
+            
+            .action-btn.large {
+                width: 52px;
+                height: 52px;
+                font-size: 20px;
+            }
+        }
+
+        /* Landscape Optimizations */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                padding: 8px 12px;
+            }
+            
+            .action-bar {
+                bottom: 5px;
+                padding: 6px;
+            }
+            
+            .action-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 16px;
+            }
+            
+            .mobile-modal {
+                padding: 15px;
+                padding-bottom: 30px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .action-bar,
+            .view-tabs,
+            .header,
+            .zoom-controls {
+                display: none !important;
+            }
+            
+            .preview-content {
+                padding: 0;
+            }
+            
+            .preview-content svg {
+                max-width: 100% !important;
+                max-height: 100% !important;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="loading" class="loading">Loading Graphviz...</div>
+    <!-- Loading Screen -->
+    <div id="loading">
+        <div class="loader"></div>
+        <div style="text-align: center;">
+            <h3 style="margin-bottom: 10px; color: #3b82f6;">Graphviz Editor</h3>
+            <p style="color: #94a3b8;">Loading editor components...</p>
+        </div>
+    </div>
     
+    <!-- Offline Status Indicator -->
+    <div class="offline-status" id="offlineStatus">Online</div>
+    
+    <!-- Main App Container -->
     <div class="container" style="display: none;" id="app">
-        <div class="toolbar">
-            <div class="toolbar-group">
-                <button class="btn secondary" id="exportSvg">Export SVG</button>
-                <button class="btn secondary" id="exportPng">Export PNG</button>
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-project-diagram"></i>
+                Graphviz Editor
             </div>
-            
-            <div class="toolbar-group">
-                <button class="btn secondary" id="changeDirection">Direction</button>
-                <button class="btn secondary" id="changeLines">Lines</button>
-                <button class="btn secondary" id="colorize">Colors</button>
-            </div>
-            
-            <div class="toolbar-group">
-                <button class="btn" id="addNode">+ Node</button>
-                <button class="btn" id="addEdge">+ Edge</button>
-            </div>
-            
-            <div class="status" id="status">Ready</div>
+            <button class="action-btn secondary" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
         
+        <!-- View Tabs (Mobile Only) -->
+        <div class="view-tabs">
+            <button class="tab active" data-view="editor">
+                <i class="fas fa-code"></i> Code
+            </button>
+            <button class="tab" data-view="preview">
+                <i class="fas fa-eye"></i> Preview
+            </button>
+        </div>
+        
+        <!-- Content Area -->
         <div class="content">
-            <button class="toggle-btn left" id="toggleLeft">›</button>
-            <button class="toggle-btn right" id="toggleRight">‹</button>
-            
+            <!-- Editor Pane -->
             <div class="editor-pane" id="editorPane">
                 <div id="editor"></div>
+                <div class="mobile-code-toolbar">
+                    <button class="code-btn" data-insert="digraph G {\n    \n}">
+                        <i class="fas fa-project-diagram"></i> New Graph
+                    </button>
+                    <button class="code-btn" data-insert=" -> ">
+                        <i class="fas fa-arrow-right"></i> Edge
+                    </button>
+                    <button class="code-btn" data-insert=" [shape=box];">
+                        <i class="fas fa-square"></i> Box
+                    </button>
+                    <button class="code-btn" data-insert=" [shape=circle];">
+                        <i class="fas fa-circle"></i> Circle
+                    </button>
+                    <button class="code-btn" data-insert=" [shape=diamond];">
+                        <i class="fas fa-gem"></i> Diamond
+                    </button>
+                    <button class="code-btn" data-insert="rankdir=LR;">
+                        <i class="fas fa-arrows-alt-h"></i> Layout
+                    </button>
+                    <button class="code-btn" data-insert="// ">
+                        <i class="fas fa-comment"></i> Comment
+                    </button>
+                </div>
             </div>
             
-            <div class="preview-pane" id="previewPane">
-                <div class="hint" id="hint"></div>
-                <div class="preview-content" id="previewContent"></div>
-                
-                <div class="modal" id="nodeModal">
-                    <div class="modal-content">
-                        <h3 id="nodeModalTitle">Add Node</h3>
-                        
-                        <label>Node Name</label>
-                        <input type="text" id="nodeNameInput" placeholder="e.g. Start">
-                        
-                        <label>Shape</label>
-                        <select id="nodeShapeSelect">
-                            <option value="box">Rectangle (box)</option>
-                            <option value="circle">Circle</option>
-                            <option value="ellipse">Ellipse</option>
-                            <option value="diamond">Diamond</option>
-                            <option value="plaintext">Text (plaintext)</option>
-                            <option value="triangle">Triangle</option>
-                        </select>
-                        
-                        <div class="modal-buttons">
-                            <button class="btn secondary" id="nodeModalCancel">Cancel</button>
-                            <button class="btn" id="nodeModalOk">OK</button>
-                        </div>
+            <!-- Preview Pane -->
+            <div class="preview-pane hidden" id="previewPane">
+                <div class="preview-controls">
+                    <button class="preview-btn" id="zoomIn">
+                        <i class="fas fa-search-plus"></i> Zoom In
+                    </button>
+                    <button class="preview-btn" id="zoomOut">
+                        <i class="fas fa-search-minus"></i> Zoom Out
+                    </button>
+                    <button class="preview-btn" id="zoomReset">
+                        <i class="fas fa-expand-arrows-alt"></i> Reset
+                    </button>
+                </div>
+                <div class="preview-content" id="previewContent">
+                    <div style="text-align: center; padding: 40px; color: #94a3b8;">
+                        <i class="fas fa-project-diagram" style="font-size: 48px; margin-bottom: 20px;"></i>
+                        <h3>Preview will appear here</h3>
+                        <p>Switch to Code tab to edit your Graphviz diagram</p>
                     </div>
+                </div>
+                
+                <!-- Zoom Controls (Floating) -->
+                <div class="zoom-controls">
+                    <button class="zoom-btn" id="floatZoomIn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="zoom-btn" id="floatZoomOut">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button class="zoom-btn" id="floatZoomReset">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                 </div>
             </div>
         </div>
+        
+        <!-- Bottom Action Bar -->
+        <div class="action-bar" id="actionBar">
+            <button class="action-btn secondary" id="addNodeBtn" title="Add Node">
+                <i class="fas fa-plus-circle"></i>
+            </button>
+            <button class="action-btn secondary" id="addEdgeBtn" title="Add Edge">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <button class="action-btn large" id="renderBtn" title="Render Graph">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="action-btn secondary" id="exportBtn" title="Export">
+                <i class="fas fa-download"></i>
+            </button>
+            <button class="action-btn secondary" id="helpBtn" title="Help">
+                <i class="fas fa-question-circle"></i>
+            </button>
+        </div>
+        
+        <!-- Side Menu -->
+        <div class="side-menu" id="sideMenu">
+            <div class="menu-header">
+                <h2>Tools & Settings</h2>
+                <button class="action-btn secondary" id="closeMenu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="menu-section">
+                <h3>Graph Layout</h3>
+                <button class="menu-btn" data-direction="LR">
+                    <i class="fas fa-arrow-right"></i>
+                    Left to Right
+                </button>
+                <button class="menu-btn" data-direction="TB">
+                    <i class="fas fa-arrow-down"></i>
+                    Top to Bottom
+                </button>
+                <button class="menu-btn" data-direction="RL">
+                    <i class="fas fa-arrow-left"></i>
+                    Right to Left
+                </button>
+                <button class="menu-btn" data-direction="BT">
+                    <i class="fas fa-arrow-up"></i>
+                    Bottom to Top
+                </button>
+            </div>
+            
+            <div class="menu-section">
+                <h3>Edge Style</h3>
+                <button class="menu-btn" data-splines="ortho">
+                    <i class="fas fa-grip-lines"></i>
+                    Orthogonal Lines
+                </button>
+                <button class="menu-btn" data-splines="curved">
+                    <i class="fas fa-wave-square"></i>
+                    Curved Lines
+                </button>
+                <button class="menu-btn" data-splines="polyline">
+                    <i class="fas fa-draw-polygon"></i>
+                    Polyline
+                </button>
+                <button class="menu-btn" data-splines="spline">
+                    <i class="fas fa-stream"></i>
+                    Spline
+                </button>
+            </div>
+            
+            <div class="menu-section">
+                <h3>Node Colors</h3>
+                <button class="menu-btn" id="colorizeBtn">
+                    <i class="fas fa-palette"></i>
+                    Color by Connectivity
+                </button>
+                <button class="menu-btn" id="clearColorsBtn">
+                    <i class="fas fa-eraser"></i>
+                    Clear Colors
+                </button>
+            </div>
+            
+            <div class="menu-section">
+                <h3>Export</h3>
+                <button class="menu-btn" id="exportSvgBtn">
+                    <i class="fas fa-file-image"></i>
+                    Export as SVG
+                </button>
+                <button class="menu-btn" id="exportPngBtn">
+                    <i class="fas fa-file-image"></i>
+                    Export as PNG
+                </button>
+                <button class="menu-btn" id="copyCodeBtn">
+                    <i class="fas fa-copy"></i>
+                    Copy DOT Code
+                </button>
+            </div>
+            
+            <div class="menu-section">
+                <h3>Examples</h3>
+                <button class="menu-btn" data-example="flowchart">
+                    <i class="fas fa-sitemap"></i>
+                    Flowchart
+                </button>
+                <button class="menu-btn" data-example="hierarchy">
+                    <i class="fas fa-sitemap"></i>
+                    Hierarchy
+                </button>
+                <button class="menu-btn" data-example="network">
+                    <i class="fas fa-network-wired"></i>
+                    Network Diagram
+                </button>
+            </div>
+        </div>
+        
+        <!-- Overlay -->
+        <div class="overlay" id="overlay"></div>
+        
+        <!-- Mobile Modals -->
+        <div class="mobile-modal" id="nodeModal">
+            <div class="modal-header">
+                <div class="modal-title" id="nodeModalTitle">Add Node</div>
+                <button class="close-modal" id="closeNodeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="form-group">
+                <label for="nodeNameInput">Node Name</label>
+                <input type="text" id="nodeNameInput" placeholder="e.g. Start" autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <label for="nodeShapeSelect">Shape</label>
+                <select id="nodeShapeSelect">
+                    <option value="box">Rectangle (box)</option>
+                    <option value="circle">Circle</option>
+                    <option value="ellipse">Ellipse</option>
+                    <option value="diamond">Diamond</option>
+                    <option value="plaintext">Text (plaintext)</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="hexagon">Hexagon</option>
+                    <option value="octagon">Octagon</option>
+                </select>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="modal-btn secondary" id="nodeModalCancel">Cancel</button>
+                <button class="modal-btn primary" id="nodeModalOk">Add Node</button>
+            </div>
+        </div>
+        
+        <!-- Toast Notification -->
+        <div class="toast" id="toast"></div>
     </div>
 
+    <!-- Service Worker Registration -->
     <script>
-        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+        // Register Service Worker for offline capability
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('data:application/javascript;base64,' + btoa(`
+                    self.addEventListener('install', (event) => {
+                        event.waitUntil(
+                            caches.open('graphviz-editor-v1').then((cache) => {
+                                return cache.addAll([
+                                    './',
+                                    'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css',
+                                    'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css',
+                                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+                                ]);
+                            })
+                        );
+                    });
+                    
+                    self.addEventListener('fetch', (event) => {
+                        event.respondWith(
+                            caches.match(event.request).then((response) => {
+                                return response || fetch(event.request);
+                            })
+                        );
+                    });
+                    
+                    self.addEventListener('message', (event) => {
+                        if (event.data === 'skipWaiting') {
+                            self.skipWaiting();
+                        }
+                    });
+                `)).then(() => {
+                    console.log('Service Worker registered');
+                    document.getElementById('offlineStatus').textContent = 'Ready offline';
+                }).catch((error) => {
+                    console.log('Service Worker registration failed:', error);
+                });
+            });
+        }
         
-        let editor;
-        let currentSvg = '';
-        let graphvizReady = false;
-        let edgeMode = false;
-        let firstNode = null;
-        let nodeElements = new Map();
-        let viewMode = 'split'; // 'split', 'code', 'preview'
+        // Update online/offline status
+        window.addEventListener('online', () => {
+            document.getElementById('offlineStatus').textContent = 'Online';
+            document.getElementById('offlineStatus').classList.remove('offline');
+        });
+        
+        window.addEventListener('offline', () => {
+            document.getElementById('offlineStatus').textContent = 'Offline';
+            document.getElementById('offlineStatus').classList.add('offline');
+        });
+    </script>
 
-        require(['vs/editor/editor.main'], function() {
-            monaco.languages.register({ id: 'dot' });
-            
-            monaco.languages.setMonarchTokensProvider('dot', {
-                keywords: [
-                    'digraph', 'graph', 'node', 'edge', 'subgraph', 'strict'
-                ],
-                attributes: [
-                    'label', 'shape', 'color', 'style', 'fillcolor', 'fontsize',
-                    'fontname', 'penwidth', 'arrowhead', 'arrowtail', 'dir',
-                    'rankdir', 'splines', 'bgcolor', 'fontcolor', 'width', 'height'
-                ],
-                shapes: [
-                    'box', 'circle', 'ellipse', 'diamond', 'plaintext', 'point',
-                    'triangle', 'invtriangle', 'polygon', 'record', 'Mrecord'
-                ],
-                tokenizer: {
-                    root: [
-                        [/[a-zA-Z_]\w*/, {
-                            cases: {
-                                '@keywords': 'keyword',
-                                '@attributes': 'attribute',
-                                '@shapes': 'type',
-                                '@default': 'identifier'
-                            }
-                        }],
-                        [/"([^"\\]|\\.)*$/, 'string.invalid'],
-                        [/"/, 'string', '@string'],
-                        [/->|--/, 'operator'],
-                        [/[{}()\[\]]/, '@brackets'],
-                        [/[;,=]/, 'delimiter'],
-                        [/\/\/.*$/, 'comment'],
-                        [/\/\*/, 'comment', '@comment'],
-                        [/\d+(\.\d+)?/, 'number']
-                    ],
-                    string: [
-                        [/[^\\"]+/, 'string'],
-                        [/"/, 'string', '@pop']
-                    ],
-                    comment: [
-                        [/[^\/*]+/, 'comment'],
-                        [/\*\//, 'comment', '@pop'],
-                        [/[\/*]/, 'comment']
-                    ]
+    <!-- CodeMirror and Main Application Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/clike/clike.min.js"></script>
+    <script>
+        // Initialize CodeMirror Editor
+        const editor = CodeMirror(document.getElementById('editor'), {
+            mode: 'text/x-csrc',
+            theme: 'dracula',
+            lineNumbers: true,
+            lineWrapping: true,
+            autofocus: true,
+            smartIndent: true,
+            tabSize: 4,
+            indentUnit: 4,
+            extraKeys: {
+                'Ctrl-Space': 'autocomplete',
+                'Tab': function(cm) {
+                    if (cm.somethingSelected()) {
+                        cm.indentSelection('add');
+                    } else {
+                        cm.replaceSelection('    ', 'end');
+                    }
+                },
+                'Shift-Tab': function(cm) {
+                    cm.indentSelection('subtract');
                 }
-            });
-
-            monaco.editor.defineTheme('dot-dark', {
-                base: 'vs-dark',
-                inherit: true,
-                rules: [
-                    { token: 'keyword', foreground: 'C586C0', fontStyle: 'bold' },
-                    { token: 'attribute', foreground: '9CDCFE' },
-                    { token: 'type', foreground: '4EC9B0' },
-                    { token: 'identifier', foreground: 'D4D4D4' },
-                    { token: 'string', foreground: 'CE9178' },
-                    { token: 'number', foreground: 'B5CEA8' },
-                    { token: 'comment', foreground: '6A9955' },
-                    { token: 'operator', foreground: 'D4D4D4' }
-                ],
-                colors: {
-                    'editor.background': '#1e293b'
-                }
-            });
-
-            editor = monaco.editor.create(document.getElementById('editor'), {
-                value: `digraph G {
+            },
+            value: `digraph G {
     rankdir=LR;
     node [style=rounded];
     
@@ -533,126 +1082,348 @@
     Process -> Decision;
     Decision -> End [label="Yes"];
     Decision -> Process [label="No"];
-}`,
-                language: 'dot',
-                theme: 'dot-dark',
-                minimap: { enabled: false },
-                fontSize: 14,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                automaticLayout: true
-            });
-
-            editor.onDidChangeModelContent(() => {
-                clearTimeout(window.renderTimeout);
-                window.renderTimeout = setTimeout(renderGraph, 500);
-            });
+}`
         });
 
+        // Application State
+        let currentSvg = '';
+        let graphvizReady = false;
+        let edgeMode = false;
+        let firstNode = null;
+        let nodeElements = new Map();
+        let currentZoom = 1.0;
+        let currentView = 'editor';
+        
+        // DOM Elements
+        const app = document.getElementById('app');
+        const loading = document.getElementById('loading');
+        const previewContent = document.getElementById('previewContent');
+        const actionBar = document.getElementById('actionBar');
+        const sideMenu = document.getElementById('sideMenu');
+        const overlay = document.getElementById('overlay');
+        const toast = document.getElementById('toast');
+        const offlineStatus = document.getElementById('offlineStatus');
+        
+        // Check Graphviz readiness
         const checkGraphviz = setInterval(() => {
-            if (window.graphviz && editor) {
+            if (window.graphviz) {
                 clearInterval(checkGraphviz);
                 graphvizReady = true;
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('app').style.display = 'flex';
+                loading.style.display = 'none';
+                app.style.display = 'flex';
                 renderGraph();
+                
+                // Show offline status if already cached
+                if (navigator.onLine === false) {
+                    offlineStatus.textContent = 'Offline';
+                    offlineStatus.classList.add('offline');
+                }
             }
         }, 100);
-
-        const preview = document.getElementById('previewContent');
-        const status = document.getElementById('status');
-        const hint = document.getElementById('hint');
-        const editorPane = document.getElementById('editorPane');
-        const previewPane = document.getElementById('previewPane');
-        const toggleLeft = document.getElementById('toggleLeft');
-        const toggleRight = document.getElementById('toggleRight');
-
-        function setStatus(text, success = true) {
-            status.textContent = text;
-            status.className = success ? 'status success' : 'status';
+        
+        // Toast Notification Function
+        function showToast(message, duration = 2000) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), duration);
         }
-
-        function showHint(text, duration = 2000) {
-            hint.textContent = text;
-            hint.classList.add('show');
-            setTimeout(() => hint.classList.remove('show'), duration);
-        }
-
-        function updateViewMode(mode) {
-            viewMode = mode;
+        
+        // View Management
+        function switchView(view) {
+            currentView = view;
             
-            if (mode === 'code') {
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.view === view) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Update panes
+            const editorPane = document.getElementById('editorPane');
+            const previewPane = document.getElementById('previewPane');
+            
+            if (view === 'editor') {
                 editorPane.classList.remove('hidden');
                 previewPane.classList.add('hidden');
-                toggleLeft.classList.add('hidden');
-                toggleRight.classList.remove('hidden');
-                toggleRight.textContent = '›';
-            } else if (mode === 'preview') {
+            } else {
                 editorPane.classList.add('hidden');
                 previewPane.classList.remove('hidden');
-                toggleLeft.classList.remove('hidden');
-                toggleLeft.textContent = '‹';
-                toggleRight.classList.add('hidden');
-            } else {
-                editorPane.classList.remove('hidden');
-                previewPane.classList.remove('hidden');
-                toggleLeft.classList.remove('hidden');
-                toggleLeft.textContent = '‹';
-                toggleRight.classList.remove('hidden');
-                toggleRight.textContent = '›';
+                // Ensure graph is rendered when switching to preview
+                if (!previewContent.querySelector('svg') && !previewContent.querySelector('.error')) {
+                    renderGraph();
+                }
+            }
+            
+            // Show hint for first time users
+            if (view === 'preview' && !localStorage.getItem('graphvizHintShown')) {
+                showToast('Tap nodes to edit, use buttons below to add elements');
+                localStorage.setItem('graphvizHintShown', 'true');
             }
         }
-
-        toggleLeft.addEventListener('click', () => {
-            if (viewMode === 'split') {
-                updateViewMode('preview');
-            } else if (viewMode === 'preview') {
-                updateViewMode('split');
-            }
+        
+        // Tab click handlers
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchView(tab.dataset.view);
+            });
         });
-
-        toggleRight.addEventListener('click', () => {
-            if (viewMode === 'split') {
-                updateViewMode('code');
-            } else if (viewMode === 'code') {
-                updateViewMode('split');
-            }
+        
+        // Mobile code toolbar insertions
+        document.querySelectorAll('.code-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const insertText = btn.dataset.insert;
+                editor.replaceSelection(insertText);
+                editor.focus();
+            });
         });
-
-        function parseGraph(dotCode) {
-            const nodes = new Map();
-            const edges = [];
-            const lines = dotCode.split('\n');
+        
+        // Menu Management
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            sideMenu.classList.add('open');
+            overlay.classList.add('show');
+        });
+        
+        document.getElementById('closeMenu').addEventListener('click', closeMenu);
+        overlay.addEventListener('click', closeMenu);
+        
+        function closeMenu() {
+            sideMenu.classList.remove('open');
+            overlay.classList.remove('show');
+        }
+        
+        // Modal Management
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('open');
+            overlay.classList.add('show');
             
-            for (const line of lines) {
-                const edgeMatch = line.match(/(\w+)\s*(?:->|--)\s*(\w+)/);
-                if (edgeMatch) {
-                    const [, from, to] = edgeMatch;
-                    edges.push({ from, to });
-                    if (!nodes.has(from)) nodes.set(from, { in: 0, out: 0 });
-                    if (!nodes.has(to)) nodes.set(to, { in: 0, out: 0 });
-                    nodes.get(from).out++;
-                    nodes.get(to).in++;
+            // Focus first input
+            const input = modal.querySelector('input');
+            if (input) {
+                setTimeout(() => input.focus(), 300);
+            }
+        }
+        
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('open');
+            overlay.classList.remove('show');
+        }
+        
+        // Graph Rendering
+        async function renderGraph() {
+            if (!graphvizReady) {
+                showToast('Graphviz still loading...');
+                return;
+            }
+            
+            const code = editor.getValue().trim();
+            if (!code) {
+                previewContent.innerHTML = '<div class="error">Enter DOT code to visualize</div>';
+                return;
+            }
+            
+            try {
+                showToast('Rendering...', 1000);
+                currentSvg = await window.graphviz.dot(code);
+                previewContent.innerHTML = currentSvg;
+                
+                // Reset zoom
+                currentZoom = 1.0;
+                updatePreviewZoom();
+                
+                // Attach node handlers
+                attachNodeHandlers();
+                
+                showToast('Graph rendered successfully');
+            } catch (e) {
+                previewContent.innerHTML = `<div class="error">Error: ${e.message}</div>`;
+                showToast('Render failed: ' + e.message, 3000);
+            }
+        }
+        
+        // Zoom Controls
+        function updatePreviewZoom() {
+            const svg = previewContent.querySelector('svg');
+            if (!svg) return;
+            
+            svg.style.transform = `scale(${currentZoom})`;
+            svg.style.transformOrigin = 'center center';
+        }
+        
+        document.getElementById('zoomIn').addEventListener('click', zoomIn);
+        document.getElementById('zoomOut').addEventListener('click', zoomOut);
+        document.getElementById('zoomReset').addEventListener('click', zoomReset);
+        document.getElementById('floatZoomIn').addEventListener('click', zoomIn);
+        document.getElementById('floatZoomOut').addEventListener('click', zoomOut);
+        document.getElementById('floatZoomReset').addEventListener('click', zoomReset);
+        
+        function zoomIn() {
+            if (currentZoom < 3) {
+                currentZoom += 0.1;
+                updatePreviewZoom();
+            }
+        }
+        
+        function zoomOut() {
+            if (currentZoom > 0.3) {
+                currentZoom -= 0.1;
+                updatePreviewZoom();
+            }
+        }
+        
+        function zoomReset() {
+            currentZoom = 1.0;
+            updatePreviewZoom();
+        }
+        
+        // Node Interaction
+        function attachNodeHandlers() {
+            nodeElements.clear();
+            const svg = previewContent.querySelector('svg');
+            if (!svg) return;
+            
+            const nodes = svg.querySelectorAll('.node');
+            nodes.forEach(node => {
+                const title = node.querySelector('title');
+                if (!title) return;
+                
+                const nodeName = title.textContent.trim();
+                nodeElements.set(nodeName, node);
+                
+                // Make touchable
+                const rect = node.querySelector('rect, ellipse, polygon, path');
+                if (rect) {
+                    rect.style.cursor = 'pointer';
+                    rect.style.transition = 'fill 0.2s ease';
                 }
                 
-                const nodeMatch = line.match(/^\s*(\w+)\s*(?:\[|;)/);
-                if (nodeMatch && !nodes.has(nodeMatch[1])) {
-                    nodes.set(nodeMatch[1], { in: 0, out: 0 });
+                node.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    handleNodeClick(nodeName);
+                });
+                
+                // Touch feedback
+                node.addEventListener('touchstart', () => {
+                    const rect = node.querySelector('rect, ellipse, polygon, path');
+                    if (rect) {
+                        rect.style.fill = '#3b82f6';
+                    }
+                });
+                
+                node.addEventListener('touchend', () => {
+                    setTimeout(() => {
+                        const rect = node.querySelector('rect, ellipse, polygon, path');
+                        if (rect) {
+                            rect.style.fill = '';
+                        }
+                    }, 200);
+                });
+            });
+        }
+        
+        function handleNodeClick(nodeName) {
+            if (edgeMode) {
+                if (!firstNode) {
+                    firstNode = nodeName;
+                    showToast(`Selected: ${nodeName}. Tap second node for edge`, 3000);
+                } else {
+                    addEdgeToCode(firstNode, nodeName);
+                    firstNode = null;
+                    edgeMode = false;
+                    document.getElementById('addEdgeBtn').classList.remove('active');
+                    renderGraph();
                 }
+            } else {
+                editNode(nodeName);
             }
+        }
+        
+        function editNode(nodeName) {
+            const modal = document.getElementById('nodeModal');
+            const input = document.getElementById('nodeNameInput');
+            const shapeSelect = document.getElementById('nodeShapeSelect');
+            const title = document.getElementById('nodeModalTitle');
             
-            return { nodes, edges };
+            title.textContent = `Edit: ${nodeName}`;
+            input.value = nodeName;
+            shapeSelect.value = getNodeShape(nodeName);
+            
+            // Set up modal handlers
+            const handleOk = () => {
+                const newName = input.value.trim();
+                const newShape = shapeSelect.value;
+                
+                if (newName) {
+                    let code = editor.getValue();
+                    
+                    // Rename node if needed
+                    if (newName !== nodeName) {
+                        const regex = new RegExp(`\\b${nodeName}\\b`, 'g');
+                        code = code.replace(regex, newName);
+                    }
+                    
+                    // Update shape
+                    const nodeDefRegex = new RegExp(`${newName}\\s*\\[([^\\]]*)\\]`);
+                    const match = code.match(nodeDefRegex);
+                    
+                    if (match) {
+                        const attrs = match[1];
+                        const hasShape = attrs.match(/shape\s*=\s*\w+/);
+                        
+                        if (hasShape) {
+                            code = code.replace(nodeDefRegex, 
+                                `${newName} [${attrs.replace(/shape\s*=\s*\w+/, `shape=${newShape}`)}]`);
+                        } else {
+                            code = code.replace(nodeDefRegex, 
+                                `${newName} [shape=${newShape}, ${attrs}]`);
+                        }
+                    } else {
+                        // Add shape attribute if node exists without attributes
+                        const lines = code.split('\n');
+                        const nodeLineIndex = lines.findIndex(l => 
+                            new RegExp(`\\b${newName}\\b`).test(l) && !l.includes('['));
+                        
+                        if (nodeLineIndex >= 0) {
+                            lines[nodeLineIndex] = lines[nodeLineIndex].replace(
+                                new RegExp(`\\b${newName}\\b`), 
+                                `${newName} [shape=${newShape}]`
+                            );
+                            code = lines.join('\n');
+                        }
+                    }
+                    
+                    editor.setValue(code);
+                    showToast('Node updated');
+                    renderGraph();
+                }
+                
+                closeModal('nodeModal');
+            };
+            
+            const handleCancel = () => {
+                closeModal('nodeModal');
+            };
+            
+            // Remove existing listeners
+            const okBtn = document.getElementById('nodeModalOk');
+            const cancelBtn = document.getElementById('nodeModalCancel');
+            const closeBtn = document.getElementById('closeNodeModal');
+            
+            okBtn.onclick = handleOk;
+            cancelBtn.onclick = handleCancel;
+            closeBtn.onclick = handleCancel;
+            
+            // Handle Enter key
+            input.onkeypress = (e) => {
+                if (e.key === 'Enter') handleOk();
+            };
+            
+            openModal('nodeModal');
         }
-
-        function getNodeColor(inEdges, outEdges) {
-            if (inEdges === 0 && outEdges > 0) return 'lightblue';
-            if (inEdges > 0 && outEdges === 0) return 'lightcoral';
-            if (inEdges === outEdges && inEdges > 0) return 'lightgreen';
-            if (inEdges > outEdges) return 'lightyellow';
-            if (outEdges > inEdges) return 'plum';
-            return 'lightgray';
-        }
-
+        
         function getNodeShape(nodeName) {
             const code = editor.getValue();
             const regex = new RegExp(`${nodeName}\\s*\\[([^\\]]+)\\]`);
@@ -663,145 +1434,11 @@
             }
             return 'box';
         }
-
-        async function renderGraph() {
-            if (!graphvizReady) return;
-
-            const code = editor.getValue().trim();
-            if (!code) {
-                preview.innerHTML = '<div class="error">Enter DOT code to visualize</div>';
-                return;
-            }
-
-            try {
-                currentSvg = await window.graphviz.dot(code);
-                preview.innerHTML = currentSvg;
-                setStatus('Rendered');
-                attachNodeHandlers();
-            } catch (e) {
-                preview.innerHTML = `<div class="error">Error: ${e.message}</div>`;
-                setStatus('Error', false);
-            }
-        }
-
-        function attachNodeHandlers() {
-            nodeElements.clear();
-            const svg = preview.querySelector('svg');
-            if (!svg) return;
-
-            const nodes = svg.querySelectorAll('.node');
-            nodes.forEach(node => {
-                const title = node.querySelector('title');
-                if (!title) return;
-                
-                const nodeName = title.textContent.trim();
-                nodeElements.set(nodeName, node);
-
-                node.style.cursor = 'pointer';
-                node.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    handleNodeClick(nodeName);
-                });
-            });
-        }
-
-        function handleNodeClick(nodeName) {
-            if (edgeMode) {
-                if (!firstNode) {
-                    firstNode = nodeName;
-                    showHint(`Selected: ${nodeName}. Click second node`);
-                } else {
-                    addEdgeToCode(firstNode, nodeName);
-                    firstNode = null;
-                    edgeMode = false;
-                    document.getElementById('addEdge').classList.remove('active');
-                }
-            } else {
-                editNode(nodeName);
-            }
-        }
-
-        function editNode(nodeName) {
-            const modal = document.getElementById('nodeModal');
-            const input = document.getElementById('nodeNameInput');
-            const shapeSelect = document.getElementById('nodeShapeSelect');
-            const title = document.getElementById('nodeModalTitle');
+        
+        // Add Node Button
+        document.getElementById('addNodeBtn').addEventListener('click', () => {
+            openModal('nodeModal');
             
-            title.textContent = `Edit: ${nodeName}`;
-            input.value = nodeName;
-            shapeSelect.value = getNodeShape(nodeName);
-            modal.classList.add('show');
-            input.focus();
-
-            const handleOk = () => {
-                const newName = input.value.trim();
-                const newShape = shapeSelect.value;
-                
-                if (newName) {
-                    let code = editor.getValue();
-                    
-                    if (newName !== nodeName) {
-                        const regex = new RegExp(`\\b${nodeName}\\b`, 'g');
-                        code = code.replace(regex, newName);
-                    }
-                    
-                    const nodeDefRegex = new RegExp(`${newName}\\s*\\[([^\\]]*)\\]`);
-                    const match = code.match(nodeDefRegex);
-                    
-                    if (match) {
-                        const attrs = match[1];
-                        const hasShape = attrs.match(/shape\s*=\s*\w+/);
-                        
-                        if (hasShape) {
-                            code = code.replace(nodeDefRegex, `${newName} [${attrs.replace(/shape\s*=\s*\w+/, `shape=${newShape}`)}]`);
-                        } else {
-                            code = code.replace(nodeDefRegex, `${newName} [shape=${newShape}, ${attrs}]`);
-                        }
-                    } else {
-                        const lines = code.split('\n');
-                        const nodeLineIndex = lines.findIndex(l => new RegExp(`\\b${newName}\\b`).test(l) && !l.includes('['));
-                        
-                        if (nodeLineIndex >= 0) {
-                            lines[nodeLineIndex] = lines[nodeLineIndex].replace(new RegExp(`\\b${newName}\\b`), `${newName} [shape=${newShape}]`);
-                            code = lines.join('\n');
-                        } else {
-                            const lastBrace = lines.findIndex(l => l.includes('}'));
-                            if (lastBrace > 0) {
-                                lines.splice(lastBrace, 0, `    ${newName} [shape=${newShape}];`);
-                                code = lines.join('\n');
-                            }
-                        }
-                    }
-                    
-                    editor.setValue(code);
-                    setStatus('Updated');
-                }
-                modal.classList.remove('show');
-                cleanup();
-            };
-
-            const handleCancel = () => {
-                modal.classList.remove('show');
-                cleanup();
-            };
-
-            const cleanup = () => {
-                document.getElementById('nodeModalOk').removeEventListener('click', handleOk);
-                document.getElementById('nodeModalCancel').removeEventListener('click', handleCancel);
-                input.removeEventListener('keypress', handleEnter);
-            };
-
-            const handleEnter = (e) => {
-                if (e.key === 'Enter') handleOk();
-            };
-
-            document.getElementById('nodeModalOk').addEventListener('click', handleOk);
-            document.getElementById('nodeModalCancel').addEventListener('click', handleCancel);
-            input.addEventListener('keypress', handleEnter);
-        }
-
-        document.getElementById('addNode').addEventListener('click', () => {
-            const modal = document.getElementById('nodeModal');
             const input = document.getElementById('nodeNameInput');
             const shapeSelect = document.getElementById('nodeShapeSelect');
             const title = document.getElementById('nodeModalTitle');
@@ -809,9 +1446,8 @@
             title.textContent = 'Add Node';
             input.value = '';
             shapeSelect.value = 'box';
-            modal.classList.add('show');
-            input.focus();
-
+            
+            // Set up handler for this specific context
             const handleOk = () => {
                 const name = input.value.trim();
                 const shape = shapeSelect.value;
@@ -820,52 +1456,42 @@
                     const code = editor.getValue();
                     const lines = code.split('\n');
                     const lastBrace = lines.findIndex(l => l.includes('}'));
+                    
                     if (lastBrace > 0) {
                         lines.splice(lastBrace, 0, `    ${name} [shape=${shape}];`);
                         editor.setValue(lines.join('\n'));
-                        setStatus('Node added');
+                        showToast('Node added');
+                        renderGraph();
                     }
                 }
-                modal.classList.remove('show');
-                cleanup();
+                
+                closeModal('nodeModal');
             };
-
-            const handleCancel = () => {
-                modal.classList.remove('show');
-                cleanup();
-            };
-
-            const cleanup = () => {
-                document.getElementById('nodeModalOk').removeEventListener('click', handleOk);
-                document.getElementById('nodeModalCancel').removeEventListener('click', handleCancel);
-                input.removeEventListener('keypress', handleEnter);
-            };
-
-            const handleEnter = (e) => {
+            
+            document.getElementById('nodeModalOk').onclick = handleOk;
+            document.getElementById('nodeModalCancel').onclick = () => closeModal('nodeModal');
+            document.getElementById('closeNodeModal').onclick = () => closeModal('nodeModal');
+            
+            input.onkeypress = (e) => {
                 if (e.key === 'Enter') handleOk();
             };
-
-            document.getElementById('nodeModalOk').addEventListener('click', handleOk);
-            document.getElementById('nodeModalCancel').addEventListener('click', handleCancel);
-            input.addEventListener('keypress', handleEnter);
         });
-
-        document.getElementById('addEdge').addEventListener('click', () => {
+        
+        // Add Edge Mode
+        document.getElementById('addEdgeBtn').addEventListener('click', () => {
             edgeMode = !edgeMode;
             firstNode = null;
-            const btn = document.getElementById('addEdge');
+            const btn = document.getElementById('addEdgeBtn');
             
             if (edgeMode) {
                 btn.classList.add('active');
-                showHint('Select start node from preview');
-                setStatus('Select start node');
+                showToast('Tap first node, then second node to create edge', 3000);
             } else {
                 btn.classList.remove('active');
-                showHint('Edge mode cancelled');
-                setStatus('Ready');
+                showToast('Edge mode cancelled');
             }
         });
-
+        
         function addEdgeToCode(from, to) {
             const code = editor.getValue();
             const lines = code.split('\n');
@@ -874,157 +1500,432 @@
             if (lastBrace > 0) {
                 lines.splice(lastBrace, 0, `    ${from} -> ${to};`);
                 editor.setValue(lines.join('\n'));
-                setStatus(`Edge added: ${from} -> ${to}`);
+                showToast(`Edge added: ${from} -> ${to}`);
             }
         }
-
-        // --- Graph Manipulation Tools ---
-
-        document.getElementById('changeDirection').addEventListener('click', () => {
-            let code = editor.getValue();
-            const directions = ['LR', 'TB', 'RL', 'BT'];
-            const currentDirMatch = code.match(/rankdir\s*=\s*(\w+)/);
-            let nextDir = 'TB';
-
-            if (currentDirMatch) {
-                const current = currentDirMatch[1];
-                const idx = directions.indexOf(current);
-                nextDir = directions[(idx + 1) % directions.length];
-                code = code.replace(/rankdir\s*=\s*\w+/, `rankdir=${nextDir}`);
-            } else {
-                // Insert after opening brace
-                code = code.replace(/({\s*)/, `$1\n    rankdir=${nextDir};`);
-            }
-            
-            editor.setValue(code);
-            showHint(`Direction: ${nextDir}`);
+        
+        // Render Button
+        document.getElementById('renderBtn').addEventListener('click', renderGraph);
+        
+        // Auto-render on code change with debounce
+        let renderTimeout;
+        editor.on('change', () => {
+            clearTimeout(renderTimeout);
+            renderTimeout = setTimeout(() => {
+                if (currentView === 'preview') {
+                    renderGraph();
+                }
+            }, 1000);
         });
-
-        document.getElementById('changeLines').addEventListener('click', () => {
-            let code = editor.getValue();
-            const splines = ['ortho', 'curved', 'polyline', 'spline'];
-            const currentMatch = code.match(/splines\s*=\s*(\w+)/);
-            let nextSpline = 'ortho';
-
-            if (currentMatch) {
-                const current = currentMatch[1];
-                const idx = splines.indexOf(current);
-                nextSpline = splines[(idx + 1) % splines.length];
-                code = code.replace(/splines\s*=\s*\w+/, `splines=${nextSpline}`);
-            } else {
-                code = code.replace(/({\s*)/, `$1\n    splines=${nextSpline};`);
-            }
-
-            editor.setValue(code);
-            showHint(`Lines: ${nextSpline}`);
-        });
-
-        document.getElementById('colorize').addEventListener('click', () => {
-            let code = editor.getValue();
-            const { nodes } = parseGraph(code);
-            
-            // First, remove existing fillcolors to reset
-            code = code.replace(/,?\s*style\s*=\s*filled/g, '');
-            code = code.replace(/,?\s*fillcolor\s*=\s*"[^"]+"/g, '');
-            // clean up empty brackets or double commas if any (simple cleanup)
-            code = code.replace(/\[\s*,/g, '[');
-            
-            // Apply new colors
-            let lines = code.split('\n');
-            nodes.forEach((stats, nodeName) => {
-                const color = getNodeColor(stats.in, stats.out);
+        
+        // Menu Button Handlers
+        
+        // Direction Changes
+        document.querySelectorAll('[data-direction]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const direction = btn.dataset.direction;
+                let code = editor.getValue();
+                const dirMatch = code.match(/rankdir\s*=\s*(\w+)/);
                 
-                // Find line defining the node
-                const regex = new RegExp(`\\b${nodeName}\\b\\s*\\[([^\\]]*)\\]`);
-                
-                let found = false;
-                for(let i=0; i<lines.length; i++) {
-                    if (lines[i].match(regex)) {
-                        lines[i] = lines[i].replace(regex, (match, attrs) => {
-                            const separator = attrs.trim() ? ', ' : '';
-                            return `${nodeName} [${attrs}${separator}style=filled, fillcolor="${color}"]`;
-                        });
-                        found = true;
-                        break;
+                if (dirMatch) {
+                    code = code.replace(/rankdir\s*=\s*\w+/, `rankdir=${direction}`);
+                } else {
+                    const lines = code.split('\n');
+                    const openBrace = lines.findIndex(l => l.includes('{'));
+                    if (openBrace >= 0) {
+                        lines.splice(openBrace + 1, 0, `    rankdir=${direction};`);
+                        code = lines.join('\n');
                     }
                 }
                 
-                // If node definition not found (implicit node), add it
-                if (!found) {
+                editor.setValue(code);
+                showToast(`Direction: ${direction}`);
+                closeMenu();
+                renderGraph();
+            });
+        });
+        
+        // Spline Changes
+        document.querySelectorAll('[data-splines]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const splines = btn.dataset.splines;
+                let code = editor.getValue();
+                const splineMatch = code.match(/splines\s*=\s*(\w+)/);
+                
+                if (splineMatch) {
+                    code = code.replace(/splines\s*=\s*\w+/, `splines=${splines}`);
+                } else {
+                    const lines = code.split('\n');
+                    const openBrace = lines.findIndex(l => l.includes('{'));
+                    if (openBrace >= 0) {
+                        lines.splice(openBrace + 1, 0, `    splines=${splines};`);
+                        code = lines.join('\n');
+                    }
+                }
+                
+                editor.setValue(code);
+                showToast(`Edge style: ${splines}`);
+                closeMenu();
+                renderGraph();
+            });
+        });
+        
+        // Colorize
+        document.getElementById('colorizeBtn').addEventListener('click', () => {
+            let code = editor.getValue();
+            
+            // Parse nodes and edges
+            const nodes = new Map();
+            const lines = code.split('\n');
+            
+            for (const line of lines) {
+                // Find edges
+                const edgeMatch = line.match(/(\w+)\s*(?:->|--)\s*(\w+)/);
+                if (edgeMatch) {
+                    const [, from, to] = edgeMatch;
+                    if (!nodes.has(from)) nodes.set(from, { in: 0, out: 0 });
+                    if (!nodes.has(to)) nodes.set(to, { in: 0, out: 0 });
+                    nodes.get(from).out++;
+                    nodes.get(to).in++;
+                }
+                
+                // Find node definitions
+                const nodeMatch = line.match(/^\s*(\w+)\s*(?:\[|;)/);
+                if (nodeMatch && !nodes.has(nodeMatch[1])) {
+                    nodes.set(nodeMatch[1], { in: 0, out: 0 });
+                }
+            }
+            
+            // Color nodes based on connectivity
+            nodes.forEach((stats, nodeName) => {
+                let color = 'lightgray';
+                if (stats.in === 0 && stats.out > 0) color = 'lightblue';
+                else if (stats.in > 0 && stats.out === 0) color = 'lightcoral';
+                else if (stats.in === stats.out && stats.in > 0) color = 'lightgreen';
+                else if (stats.in > stats.out) color = 'lightyellow';
+                else if (stats.out > stats.in) color = 'plum';
+                
+                // Find and update node
+                const regex = new RegExp(`${nodeName}\\s*\\[([^\\]]*)\\]`);
+                const match = code.match(regex);
+                
+                if (match) {
+                    const attrs = match[1];
+                    const hasFill = attrs.match(/fillcolor\s*=\s*"[^"]+"/);
+                    const hasStyle = attrs.match(/style\s*=\s*\w+/);
+                    
+                    let newAttrs = attrs;
+                    if (hasFill) {
+                        newAttrs = newAttrs.replace(/fillcolor\s*=\s*"[^"]+"/, `fillcolor="${color}"`);
+                    } else {
+                        newAttrs = `${newAttrs}, fillcolor="${color}"`.replace(/^,\s*/, '');
+                    }
+                    
+                    if (!hasStyle) {
+                        newAttrs = `style=filled, ${newAttrs}`;
+                    }
+                    
+                    code = code.replace(regex, `${nodeName} [${newAttrs}]`);
+                } else {
+                    // Add node definition
+                    const lines = code.split('\n');
                     const lastBrace = lines.findIndex(l => l.includes('}'));
                     if (lastBrace > 0) {
                         lines.splice(lastBrace, 0, `    ${nodeName} [style=filled, fillcolor="${color}"];`);
+                        code = lines.join('\n');
                     }
                 }
             });
             
-            editor.setValue(lines.join('\n'));
-            showHint('Nodes colored by connectivity');
+            editor.setValue(code);
+            showToast('Nodes colored by connectivity');
+            closeMenu();
+            renderGraph();
         });
-
-        // --- Export Tools ---
-
-        document.getElementById('exportSvg').addEventListener('click', () => {
-            if (!currentSvg) return;
+        
+        // Clear Colors
+        document.getElementById('clearColorsBtn').addEventListener('click', () => {
+            let code = editor.getValue();
+            code = code.replace(/,\s*style\s*=\s*filled/g, '');
+            code = code.replace(/,\s*fillcolor\s*=\s*"[^"]+"/g, '');
+            code = code.replace(/\[\s*,/g, '[');
+            code = code.replace(/\[\s*\]/g, '');
+            
+            editor.setValue(code);
+            showToast('Colors cleared');
+            closeMenu();
+            renderGraph();
+        });
+        
+        // Export Functions
+        document.getElementById('exportSvgBtn').addEventListener('click', exportSvg);
+        document.getElementById('exportPngBtn').addEventListener('click', exportPng);
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            openModal('nodeModal'); // Reuse modal for export options
+            const modal = document.getElementById('nodeModal');
+            modal.innerHTML = `
+                <div class="modal-header">
+                    <div class="modal-title">Export Graph</div>
+                    <button class="close-modal" id="closeExportModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div style="padding: 20px 0;">
+                    <button class="menu-btn" style="margin-bottom: 10px;" onclick="exportSvg()">
+                        <i class="fas fa-file-image"></i> Export as SVG
+                    </button>
+                    <button class="menu-btn" style="margin-bottom: 10px;" onclick="exportPng()">
+                        <i class="fas fa-file-image"></i> Export as PNG
+                    </button>
+                    <button class="menu-btn" id="copyCodeExportBtn">
+                        <i class="fas fa-copy"></i> Copy DOT Code
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('closeExportModal').onclick = () => closeModal('nodeModal');
+            document.getElementById('copyCodeExportBtn').onclick = copyCode;
+        });
+        
+        function exportSvg() {
+            if (!currentSvg) {
+                showToast('No graph to export');
+                return;
+            }
+            
             const blob = new Blob([currentSvg], { type: 'image/svg+xml' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'graph.svg';
+            a.download = 'graphviz-diagram.svg';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-        });
-
-        document.getElementById('exportPng').addEventListener('click', () => {
-            if (!currentSvg) return;
+            
+            showToast('SVG exported');
+            closeModal('nodeModal');
+        }
+        
+        function exportPng() {
+            if (!currentSvg) {
+                showToast('No graph to export');
+                return;
+            }
+            
+            const svgElement = previewContent.querySelector('svg');
+            if (!svgElement) {
+                showToast('No SVG found');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Get SVG dimensions
+            const bbox = svgElement.getBBox();
+            canvas.width = bbox.width + 40;
+            canvas.height = bbox.height + 40;
             
             const img = new Image();
-            const blob = new Blob([currentSvg], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
+            const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
             
             img.onload = () => {
-                const canvas = document.createElement('canvas');
-                // Scale up for better quality
-                const scale = 2; 
-                canvas.width = img.width * scale;
-                canvas.height = img.height * scale;
-                
-                const ctx = canvas.getContext('2d');
-                ctx.scale(scale, scale);
-                ctx.drawImage(img, 0, 0);
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 20, 20);
                 
                 const pngUrl = canvas.toDataURL('image/png');
                 const a = document.createElement('a');
                 a.href = pngUrl;
-                a.download = 'graph.png';
+                a.download = 'graphviz-diagram.png';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
+                
+                showToast('PNG exported');
+                closeModal('nodeModal');
             };
             
             img.src = url;
-        });
-
-        // --- Window Resize Handling ---
+        }
         
-        window.addEventListener('resize', () => {
-            if (editor) {
-                editor.layout();
-            }
-        });
+        // Copy Code
+        document.getElementById('copyCodeBtn').addEventListener('click', copyCode);
         
-        // Also trigger layout when toggling panels
-        [toggleLeft, toggleRight].forEach(btn => {
+        function copyCode() {
+            const code = editor.getValue();
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('DOT code copied to clipboard');
+                closeMenu();
+            }).catch(err => {
+                showToast('Failed to copy: ' + err);
+            });
+        }
+        
+        // Examples
+        document.querySelectorAll('[data-example]').forEach(btn => {
             btn.addEventListener('click', () => {
-                setTimeout(() => {
-                    if (editor) editor.layout();
-                }, 305); // slightly longer than CSS transition
+                const example = btn.dataset.example;
+                let code = '';
+                
+                switch(example) {
+                    case 'flowchart':
+                        code = `digraph flowchart {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+    
+    Start [shape=circle];
+    Input [label="Get Input"];
+    Process [label="Process Data"];
+    Decision [shape=diamond, label="Valid?"];
+    Error [shape=box, fillcolor=lightcoral];
+    Output [label="Show Result"];
+    End [shape=circle];
+    
+    Start -> Input;
+    Input -> Process;
+    Process -> Decision;
+    Decision -> Output [label="Yes"];
+    Decision -> Error [label="No"];
+    Error -> Input;
+    Output -> End;
+}`;
+                        break;
+                        
+                    case 'hierarchy':
+                        code = `digraph hierarchy {
+    rankdir=TB;
+    node [shape=box, style=filled, fillcolor=lightblue];
+    
+    CEO [shape=box, fillcolor=lightyellow];
+    
+    CTO [label="CTO\\nTech Lead"];
+    CFO [label="CFO\\nFinance"];
+    COO [label="COO\\nOperations"];
+    
+    Dev1 [label="Dev Team\\nLead"];
+    Dev2 [label="Senior\\nDeveloper"];
+    Dev3 [label="Junior\\nDeveloper"];
+    
+    CEO -> CTO;
+    CEO -> CFO;
+    CEO -> COO;
+    
+    CTO -> Dev1;
+    Dev1 -> Dev2;
+    Dev1 -> Dev3;
+}`;
+                        break;
+                        
+                    case 'network':
+                        code = `digraph network {
+    rankdir=LR;
+    node [shape=circle, style=filled];
+    edge [color="#666666"];
+    
+    Router [shape=box, fillcolor=lightyellow];
+    
+    Server1 [fillcolor=lightblue];
+    Server2 [fillcolor=lightblue];
+    Server3 [fillcolor=lightblue];
+    
+    Client1 [fillcolor=lightgreen];
+    Client2 [fillcolor=lightgreen];
+    Client3 [fillcolor=lightgreen];
+    Client4 [fillcolor=lightgreen];
+    
+    Router -> Server1;
+    Router -> Server2;
+    Router -> Server3;
+    
+    Server1 -> Client1;
+    Server1 -> Client2;
+    Server2 -> Client3;
+    Server3 -> Client4;
+}`;
+                        break;
+                }
+                
+                editor.setValue(code);
+                showToast(`Loaded ${example} example`);
+                closeMenu();
+                renderGraph();
             });
         });
-
+        
+        // Help Button
+        document.getElementById('helpBtn').addEventListener('click', () => {
+            openModal('nodeModal');
+            const modal = document.getElementById('nodeModal');
+            modal.innerHTML = `
+                <div class="modal-header">
+                    <div class="modal-title">Help & Tips</div>
+                    <button class="close-modal" id="closeHelpModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div style="padding: 20px 0; color: #94a3b8; line-height: 1.6;">
+                    <h4 style="color: white; margin-bottom: 10px;">Quick Start</h4>
+                    <p>1. Edit DOT code in the Code tab</p>
+                    <p>2. Switch to Preview to see the graph</p>
+                    <p>3. Tap nodes in preview to edit them</p>
+                    <p>4. Use bottom buttons to add elements</p>
+                    
+                    <h4 style="color: white; margin: 20px 0 10px 0;">Mobile Tips</h4>
+                    <p>• Pinch to zoom in preview</p>
+                    <p>• Use code toolbar for quick inserts</p>
+                    <p>• Menu has layout and export options</p>
+                    <p>• Works offline once loaded</p>
+                    
+                    <h4 style="color: white; margin: 20px 0 10px 0;">DOT Basics</h4>
+                    <p><code>digraph G { ... }</code> - Directed graph</p>
+                    <p><code>A -> B;</code> - Edge from A to B</p>
+                    <p><code>A [shape=box];</code> - Node attributes</p>
+                    <p><code>rankdir=LR;</code> - Left to right layout</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn primary" id="closeHelpBtn">Got it!</button>
+                </div>
+            `;
+            
+            document.getElementById('closeHelpModal').onclick = () => closeModal('nodeModal');
+            document.getElementById('closeHelpBtn').onclick = () => closeModal('nodeModal');
+        });
+        
+        // Handle orientation changes
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                editor.refresh();
+                if (currentView === 'preview') {
+                    updatePreviewZoom();
+                }
+            }, 300);
+        });
+        
+        // Prevent accidental zoom with double-tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+        
+        // Initialize view
+        setTimeout(() => {
+            switchView('editor');
+            showToast('Welcome to Graphviz Editor!', 3000);
+        }, 500);
+        
+        // Make functions available globally for inline handlers
+        window.exportSvg = exportSvg;
+        window.exportPng = exportPng;
+        window.copyCode = copyCode;
     </script>
 </body>
 </html>
