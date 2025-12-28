@@ -161,11 +161,28 @@
             overflow: auto;
         }
 
+        /* Fix for CodeMirror line numbers */
         .CodeMirror {
-            height: 100%;
+            height: 100% !important;
             font-size: 14px;
             font-family: 'Fira Code', 'Monaco', monospace;
             line-height: 1.5;
+        }
+
+        .CodeMirror-gutters {
+            background-color: #1a2535 !important;
+            border-right: 1px solid #475569 !important;
+        }
+
+        .CodeMirror-linenumber {
+            color: #94a3b8 !important;
+            min-width: 30px !important;
+            text-align: right !important;
+            padding-right: 10px !important;
+        }
+
+        .CodeMirror-line {
+            padding-left: 10px !important;
         }
 
         /* Preview Pane */
@@ -351,23 +368,24 @@
             display: block;
         }
 
-        /* Mobile Modal */
+        /* Mobile Modal - SMALLER VERSION */
         .mobile-modal {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: #1e293b;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
             z-index: 2001;
             transform: translateY(100%);
             transition: transform 0.3s ease;
-            padding: 20px;
-            padding-bottom: 40px;
-            max-height: 90vh;
+            padding: 16px;
+            padding-bottom: 32px;
+            max-height: 50vh;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
         }
 
         .mobile-modal.open {
@@ -378,13 +396,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #475569;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.5);
         }
 
         .modal-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: white;
         }
@@ -393,32 +411,32 @@
             background: none;
             border: none;
             color: #94a3b8;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
             padding: 5px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #94a3b8;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
         }
 
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 14px;
-            background: #0f172a;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.8);
             border: 1px solid #475569;
             border-radius: 8px;
             color: white;
-            font-size: 16px;
+            font-size: 15px;
             transition: all 0.2s ease;
         }
 
@@ -431,16 +449,16 @@
 
         .modal-actions {
             display: flex;
-            gap: 12px;
-            margin-top: 30px;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         .modal-btn {
             flex: 1;
-            padding: 16px;
+            padding: 14px;
             border-radius: 8px;
             border: none;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -452,7 +470,7 @@
         }
 
         .modal-btn.secondary {
-            background: #475569;
+            background: rgba(71, 85, 105, 0.7);
             color: white;
         }
 
@@ -464,7 +482,7 @@
             transform: translateX(-50%) translateY(-20px);
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
-            padding: 14px 24px;
+            padding: 12px 20px;
             border-radius: 8px;
             font-size: 14px;
             opacity: 0;
@@ -528,6 +546,26 @@
             background: #f87171;
         }
 
+        /* Share Button */
+        .share-btn {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 4000;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .view-tabs {
@@ -574,6 +612,15 @@
                 width: 40px;
                 height: 40px;
                 font-size: 16px;
+            }
+            
+            .mobile-modal {
+                max-height: 60vh;
+            }
+            
+            .share-btn {
+                top: 60px;
+                left: 10px;
             }
         }
 
@@ -623,6 +670,12 @@
                 height: 44px;
                 font-size: 17px;
             }
+            
+            .mobile-modal {
+                padding: 14px;
+                padding-bottom: 28px;
+                max-height: 55vh;
+            }
         }
 
         /* Landscape Optimizations */
@@ -644,8 +697,13 @@
             }
             
             .mobile-modal {
-                padding: 15px;
-                padding-bottom: 30px;
+                padding: 12px;
+                padding-bottom: 24px;
+                max-height: 70vh;
+            }
+            
+            .share-btn {
+                top: 50px;
             }
         }
 
@@ -654,7 +712,8 @@
             .action-bar,
             .view-tabs,
             .header,
-            .zoom-controls {
+            .zoom-controls,
+            .share-btn {
                 display: none !important;
             }
             
@@ -830,6 +889,14 @@
                 <button class="menu-btn" id="copyCodeBtn">
                     <i class="fas fa-copy"></i>
                     Copy DOT Code
+                </button>
+            </div>
+
+            <div class="menu-section">
+                <h3>Sharing</h3>
+                <button class="menu-btn" id="shareBtn">
+                    <i class="fas fa-share-alt"></i>
+                    Share (copy diagram URL)
                 </button>
             </div>
             
@@ -1011,7 +1078,6 @@
             theme: 'dracula',
             lineNumbers: true,
             lineWrapping: true,
-            autofocus: true,
             smartIndent: true,
             tabSize: 4,
             indentUnit: 4,
@@ -1063,6 +1129,8 @@
         const overlay = document.getElementById('overlay');
         const toast = document.getElementById('toast');
         const offlineStatus = document.getElementById('offlineStatus');
+        const shareBtn = document.getElementById('shareBtn');
+        const copyUrlBtn = document.getElementById('copyUrlBtn');
         
         // Check Graphviz readiness
         const checkGraphviz = setInterval(() => {
@@ -1072,6 +1140,10 @@
                 loading.style.display = 'none';
                 app.style.display = 'flex';
                 initViewMode();
+                
+                // Load code from URL if present
+                loadFromURL();
+                
                 renderGraph();
                 
                 if (navigator.onLine === false) {
@@ -1092,6 +1164,15 @@
                 document.querySelector('.view-tabs').style.display = 'flex';
                 switchView('editor');
             }
+
+            // Refresh editor after a short delay
+            setTimeout(() => {
+                if (editor) {
+                    editor.refresh();
+                    // Force a layout calculation
+                    editor.setSize();
+                }
+            }, 100);
         }
         
         // Toast Notification Function
@@ -1130,12 +1211,6 @@
                     renderGraph();
                 }
             }
-            
-            // Show hint for first time users
-            if (view === 'preview' && !localStorage.getItem('graphvizHintShown')) {
-                showToast('Tap nodes to edit, use buttons below to add elements');
-                localStorage.setItem('graphvizHintShown', 'true');
-            }
         }
         
         // Tab click handlers (mobile only)
@@ -1162,22 +1237,30 @@
         }
         
         // Modal Management
-        function openModal(modalId) {
+        function openModal(modalId, focusInput = false) {
             const modal = document.getElementById(modalId);
             modal.classList.add('open');
-            overlay.classList.add('show');
+            // Only show overlay for certain modals (help, export), NOT for node modal
+            if (modalId !== 'nodeModal') {
+                overlay.classList.add('show');
+            }
             
-            // Focus first input
-            const input = modal.querySelector('input');
-            if (input) {
-                setTimeout(() => input.focus(), 300);
+            // Only focus input if explicitly requested
+            if (focusInput) {
+                const input = modal.querySelector('input');
+                if (input) {
+                    setTimeout(() => input.focus(), 300);
+                }
             }
         }
         
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
             modal.classList.remove('open');
-            overlay.classList.remove('show');
+            // Hide overlay only if it was shown for this modal
+            if (modalId !== 'nodeModal') {
+                overlay.classList.remove('show');
+            }
         }
         
         // Graph Rendering
@@ -1206,6 +1289,9 @@
                 attachNodeHandlers();
                 
                 showToast('Graph rendered successfully');
+                
+                // Update URL with current code (debounced)
+                updateURL();
             } catch (e) {
                 previewContent.innerHTML = `<div class="error">Error: ${e.message}</div>`;
                 showToast('Render failed: ' + e.message, 3000);
@@ -1404,12 +1490,7 @@
             document.getElementById('nodeModalCancel').onclick = handleCancel;
             document.getElementById('closeNodeModal').onclick = handleCancel;
             
-            // Handle Enter key
-            input.onkeypress = (e) => {
-                if (e.key === 'Enter') handleOk();
-            };
-            
-            openModal('nodeModal');
+            openModal('nodeModal', false); // Don't auto-focus
         }
         
         function getNodeShape(nodeName) {
@@ -1472,15 +1553,10 @@
             document.getElementById('nodeModalCancel').onclick = handleCancel;
             document.getElementById('closeNodeModal').onclick = handleCancel;
             
-            // Handle Enter key
-            input.onkeypress = (e) => {
-                if (e.key === 'Enter') handleOk();
-            };
-            
-            openModal('nodeModal');
+            openModal('nodeModal', false); // Don't auto-focus
         });
         
-        // Add Edge Mode
+        // Add Edge Mode - IMPROVED: Switch to preview on mobile
         document.getElementById('addEdgeBtn').addEventListener('click', () => {
             edgeMode = !edgeMode;
             firstNode = null;
@@ -1489,6 +1565,11 @@
             if (edgeMode) {
                 btn.classList.add('active');
                 showToast('Tap first node, then second node to create edge', 3000);
+                
+                // On mobile, switch to preview view
+                if (!isDesktop && currentView === 'editor') {
+                    switchView('preview');
+                }
             } else {
                 btn.classList.remove('active');
                 showToast('Edge mode cancelled');
@@ -1512,11 +1593,16 @@
         
         // Auto-render on code change with debounce
         let renderTimeout;
+        let urlUpdateTimeout;
         editor.on('change', () => {
             clearTimeout(renderTimeout);
             if (currentView === 'preview' || isDesktop) {
                 renderTimeout = setTimeout(renderGraph, 1000);
             }
+            
+            // Update URL with debounce
+            clearTimeout(urlUpdateTimeout);
+            urlUpdateTimeout = setTimeout(updateURL, 1500);
         });
         
         // Export Button - opens export modal
@@ -1556,25 +1642,41 @@
             openModal('exportModal');
         });
         
+        // Fixed PNG export for mobile
         function exportSvg(filename = 'graphviz-diagram') {
             if (!currentSvg) {
                 showToast('No graph to export');
                 return;
             }
             
-            const blob = new Blob([currentSvg], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${filename}.svg`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showToast('SVG exported');
+            try {
+                const blob = new Blob([currentSvg], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${filename}.svg`;
+                
+                // iOS Safari workaround
+                if (navigator.userAgent.match(/iPad|iPhone|iPod/) && navigator.userAgent.match(/AppleWebKit/)) {
+                    document.body.appendChild(a);
+                }
+                
+                a.click();
+                
+                setTimeout(() => {
+                    if (navigator.userAgent.match(/iPad|iPhone|iPod/) && navigator.userAgent.match(/AppleWebKit/)) {
+                        document.body.removeChild(a);
+                    }
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                showToast('SVG exported');
+            } catch (e) {
+                showToast('Export failed: ' + e.message, 3000);
+            }
         }
         
+        // Fixed PNG export for mobile
         function exportPng(filename = 'graphviz-diagram') {
             if (!currentSvg) {
                 showToast('No graph to export');
@@ -1587,42 +1689,78 @@
                 return;
             }
             
-            // Create a canvas and draw the SVG
-            const svgData = new XMLSerializer().serializeToString(svgElement);
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Get SVG dimensions
-            const svgRect = svgElement.getBoundingClientRect();
-            canvas.width = svgRect.width * 2;
-            canvas.height = svgRect.height * 2;
-            
-            const img = new Image();
-            const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(svgBlob);
-            
-            img.onload = () => {
-                // Draw white background
-                ctx.fillStyle = 'white';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            try {
+                // Get SVG dimensions from viewBox or width/height attributes
+                const svgData = new XMLSerializer().serializeToString(svgElement);
                 
-                // Draw SVG
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                // Create a canvas with proper dimensions
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
                 
-                // Create download link
-                const pngUrl = canvas.toDataURL('image/png');
-                const a = document.createElement('a');
-                a.href = pngUrl;
-                a.download = `${filename}.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                // Parse SVG dimensions
+                const viewBox = svgElement.getAttribute('viewBox');
+                let width = parseInt(svgElement.getAttribute('width')) || 800;
+                let height = parseInt(svgElement.getAttribute('height')) || 600;
                 
-                showToast('PNG exported');
-            };
-            
-            img.src = url;
+                if (viewBox) {
+                    const parts = viewBox.split(' ');
+                    if (parts.length >= 4) {
+                        width = parseInt(parts[2]) || width;
+                        height = parseInt(parts[3]) || height;
+                    }
+                }
+                
+                // Scale for better quality
+                const scale = 2;
+                canvas.width = width * scale;
+                canvas.height = height * scale;
+                ctx.scale(scale, scale);
+                
+                // Create image from SVG data
+                const img = new Image();
+                const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
+                
+                img.onload = () => {
+                    // Draw white background
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, width, height);
+                    
+                    // Draw SVG
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Create download link
+                    const pngUrl = canvas.toDataURL('image/png');
+                    const a = document.createElement('a');
+                    a.href = pngUrl;
+                    a.download = `${filename}.png`;
+                    
+                    // iOS Safari workaround
+                    if (navigator.userAgent.match(/iPad|iPhone|iPod/) && navigator.userAgent.match(/AppleWebKit/)) {
+                        document.body.appendChild(a);
+                    }
+                    
+                    a.click();
+                    
+                    setTimeout(() => {
+                        if (navigator.userAgent.match(/iPad|iPhone|iPod/) && navigator.userAgent.match(/AppleWebKit/)) {
+                            document.body.removeChild(a);
+                        }
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                    
+                    showToast('PNG exported');
+                };
+                
+                img.onerror = () => {
+                    showToast('Failed to load SVG for PNG export', 3000);
+                    URL.revokeObjectURL(url);
+                };
+                
+                img.src = url;
+            } catch (e) {
+                showToast('PNG export failed: ' + e.message, 3000);
+            }
         }
         
         // Help Button - opens help modal
@@ -1645,6 +1783,57 @@
             
             openModal('helpModal');
         });
+        
+        // Share Button - generates shareable URL
+        shareBtn.addEventListener('click', () => {
+            const code = editor.getValue();
+            if (!code.trim()) {
+                showToast('Create a diagram first to share');
+                return;
+            }
+            
+            try {
+                // Create shareable URL
+                const base64Code = btoa(encodeURIComponent(code));
+                const shareUrl = `${window.location.origin}${window.location.pathname}#${base64Code}`;
+                // Copy to clipboard
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    showToast('Link copied to clipboard!');
+                });
+            } catch (e) {
+                showToast('Failed to create share link: ' + e.message, 3000);
+            }
+        });
+        
+        // Load code from URL hash
+        function loadFromURL() {
+            try {
+                const hash = window.location.hash.substring(1);
+                if (hash) {
+                    const decodedCode = decodeURIComponent(atob(hash));
+                    editor.setValue(decodedCode);
+                    showToast('Diagram loaded from URL');
+                    
+                    // Render immediately
+                    setTimeout(renderGraph, 500);
+                }
+            } catch (e) {
+                console.log('No valid diagram code in URL');
+            }
+        }
+        
+        // Update URL with current code
+        function updateURL() {
+            try {
+                const code = editor.getValue();
+                if (code.trim()) {
+                    const base64Code = btoa(encodeURIComponent(code));
+                    window.location.hash = base64Code;
+                }
+            } catch (e) {
+                console.log('Failed to update URL');
+            }
+        }
         
         // Menu Button Handlers
         
@@ -1698,7 +1887,7 @@
             });
         });
         
-        // Colorize
+        // Colorize with improved color scheme
         document.getElementById('colorizeBtn').addEventListener('click', () => {
             let code = editor.getValue();
             
@@ -1724,14 +1913,20 @@
                 }
             }
             
+            // Improved color scheme for diagrams
+            const getNodeColor = (inEdges, outEdges) => {
+                // Standard diagram colors
+                if (inEdges === 0 && outEdges > 0) return '#4ade80'; // Start node - green
+                if (inEdges > 0 && outEdges === 0) return '#f87171'; // End node - red
+                if (inEdges === outEdges && inEdges > 0) return '#fbbf24'; // Balanced - yellow
+                if (inEdges > outEdges) return '#60a5fa'; // More incoming - blue
+                if (outEdges > inEdges) return '#c084fc'; // More outgoing - purple
+                return '#d1d5db'; // Default - gray
+            };
+            
             // Color nodes based on connectivity
             nodes.forEach((stats, nodeName) => {
-                let color = 'lightgray';
-                if (stats.in === 0 && stats.out > 0) color = 'lightblue';
-                else if (stats.in > 0 && stats.out === 0) color = 'lightcoral';
-                else if (stats.in === stats.out && stats.in > 0) color = 'lightgreen';
-                else if (stats.in > stats.out) color = 'lightyellow';
-                else if (stats.out > stats.in) color = 'plum';
+                const color = getNodeColor(stats.in, stats.out);
                 
                 // Find and update node
                 const regex = new RegExp(`${nodeName}\\s*\\[([^\\]]*)\\]`);
@@ -1819,13 +2014,13 @@
     rankdir=TB;
     node [shape=box, style=rounded];
     
-    Start [shape=circle];
-    Input [label="Get Input"];
-    Process [label="Process Data"];
-    Decision [shape=diamond, label="Valid?"];
-    Error [shape=box, fillcolor=lightcoral];
-    Output [label="Show Result"];
-    End [shape=circle];
+    Start [shape=circle, fillcolor="#4ade80"];
+    Input [label="Get Input", fillcolor="#60a5fa"];
+    Process [label="Process Data", fillcolor="#60a5fa"];
+    Decision [shape=diamond, label="Valid?", fillcolor="#fbbf24"];
+    Error [shape=box, fillcolor="#f87171"];
+    Output [label="Show Result", fillcolor="#60a5fa"];
+    End [shape=circle, fillcolor="#f87171"];
     
     Start -> Input;
     Input -> Process;
@@ -1840,17 +2035,17 @@
                     case 'hierarchy':
                         code = `digraph hierarchy {
     rankdir=TB;
-    node [shape=box, style=filled, fillcolor=lightblue];
+    node [shape=box, style=filled];
     
-    CEO [shape=box, fillcolor=lightyellow];
+    CEO [fillcolor="#fbbf24"];
     
-    CTO [label="CTO\\nTech Lead"];
-    CFO [label="CFO\\nFinance"];
-    COO [label="COO\\nOperations"];
+    CTO [label="CTO\\nTech Lead", fillcolor="#60a5fa"];
+    CFO [label="CFO\\nFinance", fillcolor="#4ade80"];
+    COO [label="COO\\nOperations", fillcolor="#c084fc"];
     
-    Dev1 [label="Dev Team\\nLead"];
-    Dev2 [label="Senior\\nDeveloper"];
-    Dev3 [label="Junior\\nDeveloper"];
+    Dev1 [label="Dev Team\\nLead", fillcolor="#60a5fa"];
+    Dev2 [label="Senior\\nDeveloper", fillcolor="#4ade80"];
+    Dev3 [label="Junior\\nDeveloper", fillcolor="#c084fc"];
     
     CEO -> CTO;
     CEO -> CFO;
@@ -1868,16 +2063,16 @@
     node [shape=circle, style=filled];
     edge [color="#666666"];
     
-    Router [shape=box, fillcolor=lightyellow];
+    Router [shape=box, fillcolor="#fbbf24"];
     
-    Server1 [fillcolor=lightblue];
-    Server2 [fillcolor=lightblue];
-    Server3 [fillcolor=lightblue];
+    Server1 [fillcolor="#60a5fa"];
+    Server2 [fillcolor="#60a5fa"];
+    Server3 [fillcolor="#60a5fa"];
     
-    Client1 [fillcolor=lightgreen];
-    Client2 [fillcolor=lightgreen];
-    Client3 [fillcolor=lightgreen];
-    Client4 [fillcolor=lightgreen];
+    Client1 [fillcolor="#4ade80"];
+    Client2 [fillcolor="#4ade80"];
+    Client3 [fillcolor="#4ade80"];
+    Client4 [fillcolor="#4ade80"];
     
     Router -> Server1;
     Router -> Server2;
