@@ -27,7 +27,6 @@
             overflow: hidden;
             height: 100vh;
             width: 100vw;
-            touch-action: pan-x pan-y;
         }
 
         /* Loading Screen */
@@ -70,7 +69,7 @@
         /* Header */
         .header {
             background: linear-gradient(to right, #1e293b, #334155);
-            padding: 12px 16px;
+            padding: 8px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -78,10 +77,11 @@
             flex-shrink: 0;
             z-index: 100;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            min-height: 56px;
         }
 
         .logo {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: white;
             display: flex;
@@ -93,9 +93,9 @@
             color: #3b82f6;
         }
 
-        /* View Tabs */
+        /* View Tabs (Mobile Only) */
         .view-tabs {
-            display: flex;
+            display: none;
             background: #1e293b;
             border-bottom: 1px solid #475569;
             flex-shrink: 0;
@@ -104,12 +104,12 @@
 
         .tab {
             flex: 1;
-            padding: 14px;
+            padding: 12px;
             text-align: center;
             background: transparent;
             border: none;
             color: #94a3b8;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -161,44 +161,28 @@
             overflow: auto;
         }
 
+        /* Fix for CodeMirror line numbers */
         .CodeMirror {
-            height: 100%;
-            font-size: 15px;
+            height: 100% !important;
+            font-size: 14px;
             font-family: 'Fira Code', 'Monaco', monospace;
             line-height: 1.5;
         }
 
-        /* Mobile Code Toolbar */
-        .mobile-code-toolbar {
-            display: flex;
-            gap: 8px;
-            padding: 10px;
-            background: #334155;
-            border-top: 1px solid #475569;
-            overflow-x: auto;
-            flex-shrink: 0;
-            -webkit-overflow-scrolling: touch;
+        .CodeMirror-gutters {
+            background-color: #1a2535 !important;
+            border-right: 1px solid #475569 !important;
         }
 
-        .code-btn {
-            padding: 10px 14px;
-            background: #475569;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 13px;
-            white-space: nowrap;
-            flex-shrink: 0;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .CodeMirror-linenumber {
+            color: #94a3b8 !important;
+            min-width: 30px !important;
+            text-align: right !important;
+            padding-right: 10px !important;
         }
 
-        .code-btn:hover {
-            background: #3b82f6;
-        }
-
-        .code-btn i {
-            margin-right: 6px;
+        .CodeMirror-line {
+            padding-left: 10px !important;
         }
 
         /* Preview Pane */
@@ -216,33 +200,6 @@
             display: none;
         }
 
-        .preview-controls {
-            padding: 12px;
-            display: flex;
-            gap: 10px;
-            background: #334155;
-            border-bottom: 1px solid #475569;
-            flex-shrink: 0;
-        }
-
-        .preview-btn {
-            padding: 10px 16px;
-            background: #475569;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .preview-btn:hover {
-            background: #3b82f6;
-        }
-
         .preview-content {
             flex: 1;
             overflow: auto;
@@ -250,7 +207,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            -webkit-overflow-scrolling: touch;
             position: relative;
         }
 
@@ -274,35 +230,35 @@
         /* Bottom Action Bar */
         .action-bar {
             position: fixed;
-            bottom: 20px;
+            bottom: 16px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 12px;
-            padding: 12px;
+            gap: 10px;
+            padding: 10px 14px;
             background: rgba(30, 41, 59, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 16px;
             border: 1px solid #475569;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
             z-index: 1000;
             transition: all 0.3s ease;
         }
 
         .action-btn {
-            width: 56px;
-            height: 56px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             border: none;
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
-            font-size: 20px;
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
         }
 
         .action-btn:hover {
@@ -316,20 +272,20 @@
 
         .action-btn.secondary {
             background: linear-gradient(135deg, #475569 0%, #334155 100%);
-            box-shadow: 0 4px 8px rgba(71, 85, 105, 0.3);
+            box-shadow: 0 4px 6px rgba(71, 85, 105, 0.3);
         }
 
         .action-btn.large {
-            width: 64px;
-            height: 64px;
-            font-size: 24px;
+            width: 52px;
+            height: 52px;
+            font-size: 20px;
         }
 
         /* Side Menu */
         .side-menu {
             position: fixed;
             top: 0;
-            right: -320px;
+            right: -100%;
             width: 320px;
             height: 100%;
             background: rgba(15, 23, 42, 0.98);
@@ -412,23 +368,24 @@
             display: block;
         }
 
-        /* Mobile Modal */
+        /* Mobile Modal - SMALLER VERSION */
         .mobile-modal {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: #1e293b;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
             z-index: 2001;
             transform: translateY(100%);
             transition: transform 0.3s ease;
-            padding: 20px;
-            padding-bottom: 40px;
-            max-height: 90vh;
+            padding: 16px;
+            padding-bottom: 32px;
+            max-height: 50vh;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
         }
 
         .mobile-modal.open {
@@ -439,13 +396,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #475569;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.5);
         }
 
         .modal-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: white;
         }
@@ -454,32 +411,32 @@
             background: none;
             border: none;
             color: #94a3b8;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
             padding: 5px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #94a3b8;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
         }
 
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 14px;
-            background: #0f172a;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.8);
             border: 1px solid #475569;
             border-radius: 8px;
             color: white;
-            font-size: 16px;
+            font-size: 15px;
             transition: all 0.2s ease;
         }
 
@@ -492,16 +449,16 @@
 
         .modal-actions {
             display: flex;
-            gap: 12px;
-            margin-top: 30px;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         .modal-btn {
             flex: 1;
-            padding: 16px;
+            padding: 14px;
             border-radius: 8px;
             border: none;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -513,7 +470,7 @@
         }
 
         .modal-btn.secondary {
-            background: #475569;
+            background: rgba(71, 85, 105, 0.7);
             color: white;
         }
 
@@ -525,7 +482,7 @@
             transform: translateX(-50%) translateY(-20px);
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
-            padding: 14px 24px;
+            padding: 12px 20px;
             border-radius: 8px;
             font-size: 14px;
             opacity: 0;
@@ -546,7 +503,6 @@
             top: 20px;
             right: 20px;
             display: flex;
-            flex-direction: column;
             gap: 8px;
             z-index: 100;
         }
@@ -590,15 +546,88 @@
             background: #f87171;
         }
 
+        /* Share Button */
+        .share-btn {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 4000;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
         /* Responsive Design */
-        @media (min-width: 769px) {
-            .container {
-                max-width: 1400px;
-                margin: 0 auto;
+        @media (max-width: 768px) {
+            .view-tabs {
+                display: flex;
             }
             
-            .view-tabs {
-                display: none;
+            .header {
+                padding: 6px 12px;
+                min-height: 44px;
+            }
+            
+            .logo {
+                font-size: 1rem;
+            }
+            
+            .action-bar {
+                bottom: 8px;
+                padding: 8px 12px;
+            }
+            
+            .action-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 16px;
+            }
+            
+            .action-btn.large {
+                width: 48px;
+                height: 48px;
+                font-size: 18px;
+            }
+            
+            .side-menu {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .zoom-controls {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .zoom-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .mobile-modal {
+                max-height: 60vh;
+            }
+            
+            .share-btn {
+                top: 60px;
+                left: 10px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .container {
+                width: 100%;
+                max-width: 100%;
             }
             
             .content {
@@ -617,99 +646,64 @@
                 transform: translateX(-50%);
             }
             
-            .mobile-code-toolbar {
-                display: none;
-            }
-            
             .side-menu {
-                width: 380px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                padding: 10px 12px;
-            }
-            
-            .logo {
-                font-size: 1.1rem;
-            }
-            
-            .action-bar {
-                bottom: 10px;
-                padding: 10px;
-            }
-            
-            .action-btn {
-                width: 52px;
-                height: 52px;
-            }
-            
-            .action-btn.large {
-                width: 56px;
-                height: 56px;
-            }
-            
-            .side-menu {
-                width: 100%;
-                right: -100%;
-            }
-            
-            .zoom-controls {
-                top: 10px;
-                right: 10px;
+                width: 350px;
+                right: -350px;
             }
         }
 
         @media (max-width: 480px) {
-            .mobile-code-toolbar {
-                padding: 8px;
-                gap: 6px;
-            }
-            
-            .code-btn {
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-            
             .action-bar {
                 bottom: 5px;
-                padding: 8px;
+                padding: 6px 10px;
+                gap: 8px;
             }
             
             .action-btn {
-                width: 48px;
-                height: 48px;
-                font-size: 18px;
+                width: 40px;
+                height: 40px;
+                font-size: 15px;
             }
             
             .action-btn.large {
-                width: 52px;
-                height: 52px;
-                font-size: 20px;
+                width: 44px;
+                height: 44px;
+                font-size: 17px;
+            }
+            
+            .mobile-modal {
+                padding: 14px;
+                padding-bottom: 28px;
+                max-height: 55vh;
             }
         }
 
         /* Landscape Optimizations */
         @media (max-height: 500px) and (orientation: landscape) {
             .header {
-                padding: 8px 12px;
+                padding: 4px 12px;
+                min-height: 40px;
             }
             
             .action-bar {
                 bottom: 5px;
-                padding: 6px;
+                padding: 5px;
             }
             
             .action-btn {
-                width: 44px;
-                height: 44px;
-                font-size: 16px;
+                width: 38px;
+                height: 38px;
+                font-size: 14px;
             }
             
             .mobile-modal {
-                padding: 15px;
-                padding-bottom: 30px;
+                padding: 12px;
+                padding-bottom: 24px;
+                max-height: 70vh;
+            }
+            
+            .share-btn {
+                top: 50px;
             }
         }
 
@@ -718,7 +712,8 @@
             .action-bar,
             .view-tabs,
             .header,
-            .zoom-controls {
+            .zoom-controls,
+            .share-btn {
                 display: none !important;
             }
             
@@ -774,44 +769,10 @@
             <!-- Editor Pane -->
             <div class="editor-pane" id="editorPane">
                 <div id="editor"></div>
-                <div class="mobile-code-toolbar">
-                    <button class="code-btn" data-insert="digraph G {\n    \n}">
-                        <i class="fas fa-project-diagram"></i> New Graph
-                    </button>
-                    <button class="code-btn" data-insert=" -> ">
-                        <i class="fas fa-arrow-right"></i> Edge
-                    </button>
-                    <button class="code-btn" data-insert=" [shape=box];">
-                        <i class="fas fa-square"></i> Box
-                    </button>
-                    <button class="code-btn" data-insert=" [shape=circle];">
-                        <i class="fas fa-circle"></i> Circle
-                    </button>
-                    <button class="code-btn" data-insert=" [shape=diamond];">
-                        <i class="fas fa-gem"></i> Diamond
-                    </button>
-                    <button class="code-btn" data-insert="rankdir=LR;">
-                        <i class="fas fa-arrows-alt-h"></i> Layout
-                    </button>
-                    <button class="code-btn" data-insert="// ">
-                        <i class="fas fa-comment"></i> Comment
-                    </button>
-                </div>
             </div>
             
             <!-- Preview Pane -->
             <div class="preview-pane hidden" id="previewPane">
-                <div class="preview-controls">
-                    <button class="preview-btn" id="zoomIn">
-                        <i class="fas fa-search-plus"></i> Zoom In
-                    </button>
-                    <button class="preview-btn" id="zoomOut">
-                        <i class="fas fa-search-minus"></i> Zoom Out
-                    </button>
-                    <button class="preview-btn" id="zoomReset">
-                        <i class="fas fa-expand-arrows-alt"></i> Reset
-                    </button>
-                </div>
                 <div class="preview-content" id="previewContent">
                     <div style="text-align: center; padding: 40px; color: #94a3b8;">
                         <i class="fas fa-project-diagram" style="font-size: 48px; margin-bottom: 20px;"></i>
@@ -820,15 +781,15 @@
                     </div>
                 </div>
                 
-                <!-- Zoom Controls (Floating) -->
+                <!-- Zoom Controls -->
                 <div class="zoom-controls">
-                    <button class="zoom-btn" id="floatZoomIn">
+                    <button class="zoom-btn" id="zoomIn">
                         <i class="fas fa-plus"></i>
                     </button>
-                    <button class="zoom-btn" id="floatZoomOut">
+                    <button class="zoom-btn" id="zoomOut">
                         <i class="fas fa-minus"></i>
                     </button>
-                    <button class="zoom-btn" id="floatZoomReset">
+                    <button class="zoom-btn" id="zoomReset">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
@@ -930,6 +891,14 @@
                     Copy DOT Code
                 </button>
             </div>
+
+            <div class="menu-section">
+                <h3>Sharing</h3>
+                <button class="menu-btn" id="shareBtn">
+                    <i class="fas fa-share-alt"></i>
+                    Share (copy diagram URL)
+                </button>
+            </div>
             
             <div class="menu-section">
                 <h3>Examples</h3>
@@ -951,7 +920,7 @@
         <!-- Overlay -->
         <div class="overlay" id="overlay"></div>
         
-        <!-- Mobile Modals -->
+        <!-- Node Modal -->
         <div class="mobile-modal" id="nodeModal">
             <div class="modal-header">
                 <div class="modal-title" id="nodeModalTitle">Add Node</div>
@@ -974,8 +943,6 @@
                     <option value="diamond">Diamond</option>
                     <option value="plaintext">Text (plaintext)</option>
                     <option value="triangle">Triangle</option>
-                    <option value="hexagon">Hexagon</option>
-                    <option value="octagon">Octagon</option>
                 </select>
             </div>
             
@@ -985,13 +952,74 @@
             </div>
         </div>
         
+        <!-- Export Modal -->
+        <div class="mobile-modal" id="exportModal">
+            <div class="modal-header">
+                <div class="modal-title">Export Graph</div>
+                <button class="close-modal" id="closeExportModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="form-group">
+                <label for="exportFilename">Filename</label>
+                <input type="text" id="exportFilename" placeholder="graphviz-diagram" value="graphviz-diagram">
+            </div>
+            
+            <div class="form-group">
+                <label for="exportFormat">Format</label>
+                <select id="exportFormat">
+                    <option value="svg">SVG (Scalable Vector Graphics)</option>
+                    <option value="png">PNG (Portable Network Graphics)</option>
+                </select>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="modal-btn secondary" id="exportModalCancel">Cancel</button>
+                <button class="modal-btn primary" id="exportModalOk">Export</button>
+            </div>
+        </div>
+        
+        <!-- Help Modal -->
+        <div class="mobile-modal" id="helpModal">
+            <div class="modal-header">
+                <div class="modal-title">Help & Tips</div>
+                <button class="close-modal" id="closeHelpModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div style="padding: 20px 0; color: #94a3b8; line-height: 1.6;">
+                <h4 style="color: white; margin-bottom: 10px;">Quick Start</h4>
+                <p>1. Edit DOT code in the Code tab</p>
+                <p>2. Switch to Preview to see the graph</p>
+                <p>3. Tap nodes in preview to edit them</p>
+                <p>4. Use bottom buttons to add elements</p>
+                
+                <h4 style="color: white; margin: 20px 0 10px 0;">Mobile Tips</h4>
+                <p>• Pinch to zoom in preview</p>
+                <p>• Use code toolbar for quick inserts</p>
+                <p>• Menu has layout and export options</p>
+                <p>• Works offline once loaded</p>
+                
+                <h4 style="color: white; margin: 20px 0 10px 0;">DOT Basics</h4>
+                <p><code>digraph G { ... }</code> - Directed graph</p>
+                <p><code>A -> B;</code> - Edge from A to B</p>
+                <p><code>A [shape=box];</code> - Node attributes</p>
+                <p><code>rankdir=LR;</code> - Left to right layout</p>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="modal-btn primary" id="closeHelpBtn">Got it!</button>
+            </div>
+        </div>
+        
         <!-- Toast Notification -->
         <div class="toast" id="toast"></div>
     </div>
 
     <!-- Service Worker Registration -->
     <script>
-        // Register Service Worker for offline capability
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('data:application/javascript;base64,' + btoa(`
@@ -1023,14 +1051,12 @@
                     });
                 `)).then(() => {
                     console.log('Service Worker registered');
-                    document.getElementById('offlineStatus').textContent = 'Ready offline';
                 }).catch((error) => {
                     console.log('Service Worker registration failed:', error);
                 });
             });
         }
         
-        // Update online/offline status
         window.addEventListener('online', () => {
             document.getElementById('offlineStatus').textContent = 'Online';
             document.getElementById('offlineStatus').classList.remove('offline');
@@ -1052,7 +1078,6 @@
             theme: 'dracula',
             lineNumbers: true,
             lineWrapping: true,
-            autofocus: true,
             smartIndent: true,
             tabSize: 4,
             indentUnit: 4,
@@ -1093,6 +1118,7 @@
         let nodeElements = new Map();
         let currentZoom = 1.0;
         let currentView = 'editor';
+        let isDesktop = window.innerWidth >= 769;
         
         // DOM Elements
         const app = document.getElementById('app');
@@ -1103,6 +1129,8 @@
         const overlay = document.getElementById('overlay');
         const toast = document.getElementById('toast');
         const offlineStatus = document.getElementById('offlineStatus');
+        const shareBtn = document.getElementById('shareBtn');
+        const copyUrlBtn = document.getElementById('copyUrlBtn');
         
         // Check Graphviz readiness
         const checkGraphviz = setInterval(() => {
@@ -1111,15 +1139,41 @@
                 graphvizReady = true;
                 loading.style.display = 'none';
                 app.style.display = 'flex';
+                initViewMode();
+                
+                // Load code from URL if present
+                loadFromURL();
+                
                 renderGraph();
                 
-                // Show offline status if already cached
                 if (navigator.onLine === false) {
                     offlineStatus.textContent = 'Offline';
                     offlineStatus.classList.add('offline');
                 }
             }
         }, 100);
+        
+        // Initialize view mode based on device
+        function initViewMode() {
+            isDesktop = window.innerWidth >= 769;
+            if (isDesktop) {
+                document.querySelector('.view-tabs').style.display = 'none';
+                document.getElementById('editorPane').classList.remove('hidden');
+                document.getElementById('previewPane').classList.remove('hidden');
+            } else {
+                document.querySelector('.view-tabs').style.display = 'flex';
+                switchView('editor');
+            }
+
+            // Refresh editor after a short delay
+            setTimeout(() => {
+                if (editor) {
+                    editor.refresh();
+                    // Force a layout calculation
+                    editor.setSize();
+                }
+            }, 100);
+        }
         
         // Toast Notification Function
         function showToast(message, duration = 2000) {
@@ -1128,8 +1182,10 @@
             setTimeout(() => toast.classList.remove('show'), duration);
         }
         
-        // View Management
+        // View Management for mobile
         function switchView(view) {
+            if (isDesktop) return; // Desktop always shows both panels
+            
             currentView = view;
             
             // Update tabs
@@ -1155,27 +1211,14 @@
                     renderGraph();
                 }
             }
-            
-            // Show hint for first time users
-            if (view === 'preview' && !localStorage.getItem('graphvizHintShown')) {
-                showToast('Tap nodes to edit, use buttons below to add elements');
-                localStorage.setItem('graphvizHintShown', 'true');
-            }
         }
         
-        // Tab click handlers
+        // Tab click handlers (mobile only)
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
-                switchView(tab.dataset.view);
-            });
-        });
-        
-        // Mobile code toolbar insertions
-        document.querySelectorAll('.code-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const insertText = btn.dataset.insert;
-                editor.replaceSelection(insertText);
-                editor.focus();
+                if (!isDesktop) {
+                    switchView(tab.dataset.view);
+                }
             });
         });
         
@@ -1194,22 +1237,30 @@
         }
         
         // Modal Management
-        function openModal(modalId) {
+        function openModal(modalId, focusInput = false) {
             const modal = document.getElementById(modalId);
             modal.classList.add('open');
-            overlay.classList.add('show');
+            // Only show overlay for certain modals (help, export), NOT for node modal
+            if (modalId !== 'nodeModal') {
+                overlay.classList.add('show');
+            }
             
-            // Focus first input
-            const input = modal.querySelector('input');
-            if (input) {
-                setTimeout(() => input.focus(), 300);
+            // Only focus input if explicitly requested
+            if (focusInput) {
+                const input = modal.querySelector('input');
+                if (input) {
+                    setTimeout(() => input.focus(), 300);
+                }
             }
         }
         
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
             modal.classList.remove('open');
-            overlay.classList.remove('show');
+            // Hide overlay only if it was shown for this modal
+            if (modalId !== 'nodeModal') {
+                overlay.classList.remove('show');
+            }
         }
         
         // Graph Rendering
@@ -1238,6 +1289,9 @@
                 attachNodeHandlers();
                 
                 showToast('Graph rendered successfully');
+                
+                // Update URL with current code (debounced)
+                updateURL();
             } catch (e) {
                 previewContent.innerHTML = `<div class="error">Error: ${e.message}</div>`;
                 showToast('Render failed: ' + e.message, 3000);
@@ -1256,9 +1310,6 @@
         document.getElementById('zoomIn').addEventListener('click', zoomIn);
         document.getElementById('zoomOut').addEventListener('click', zoomOut);
         document.getElementById('zoomReset').addEventListener('click', zoomReset);
-        document.getElementById('floatZoomIn').addEventListener('click', zoomIn);
-        document.getElementById('floatZoomOut').addEventListener('click', zoomOut);
-        document.getElementById('floatZoomReset').addEventListener('click', zoomReset);
         
         function zoomIn() {
             if (currentZoom < 3) {
@@ -1278,6 +1329,42 @@
             currentZoom = 1.0;
             updatePreviewZoom();
         }
+        
+        // Pinch-to-zoom implementation
+        let initialDistance = null;
+        let initialZoom = 1.0;
+        
+        previewContent.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                initialDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                initialZoom = currentZoom;
+            }
+        }, { passive: false });
+        
+        previewContent.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && initialDistance !== null) {
+                e.preventDefault();
+                const currentDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                const scale = currentDistance / initialDistance;
+                currentZoom = Math.max(0.3, Math.min(3, initialZoom * scale));
+                updatePreviewZoom();
+            }
+        }, { passive: false });
+        
+        previewContent.addEventListener('touchend', () => {
+            initialDistance = null;
+        });
+        
+        // Enable scrolling in preview
+        previewContent.style.overflow = 'auto';
+        previewContent.style.webkitOverflowScrolling = 'touch';
         
         // Node Interaction
         function attachNodeHandlers() {
@@ -1303,23 +1390,6 @@
                 node.addEventListener('click', (e) => {
                     e.stopPropagation();
                     handleNodeClick(nodeName);
-                });
-                
-                // Touch feedback
-                node.addEventListener('touchstart', () => {
-                    const rect = node.querySelector('rect, ellipse, polygon, path');
-                    if (rect) {
-                        rect.style.fill = '#3b82f6';
-                    }
-                });
-                
-                node.addEventListener('touchend', () => {
-                    setTimeout(() => {
-                        const rect = node.querySelector('rect, ellipse, polygon, path');
-                        if (rect) {
-                            rect.style.fill = '';
-                        }
-                    }, 200);
                 });
             });
         }
@@ -1407,21 +1477,20 @@
                 closeModal('nodeModal');
             };
             
-            // Remove existing listeners
+            // Remove existing listeners and add new ones
             const okBtn = document.getElementById('nodeModalOk');
             const cancelBtn = document.getElementById('nodeModalCancel');
             const closeBtn = document.getElementById('closeNodeModal');
             
-            okBtn.onclick = handleOk;
-            cancelBtn.onclick = handleCancel;
-            closeBtn.onclick = handleCancel;
+            okBtn.replaceWith(okBtn.cloneNode(true));
+            cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+            closeBtn.replaceWith(closeBtn.cloneNode(true));
             
-            // Handle Enter key
-            input.onkeypress = (e) => {
-                if (e.key === 'Enter') handleOk();
-            };
+            document.getElementById('nodeModalOk').onclick = handleOk;
+            document.getElementById('nodeModalCancel').onclick = handleCancel;
+            document.getElementById('closeNodeModal').onclick = handleCancel;
             
-            openModal('nodeModal');
+            openModal('nodeModal', false); // Don't auto-focus
         }
         
         function getNodeShape(nodeName) {
@@ -1437,8 +1506,7 @@
         
         // Add Node Button
         document.getElementById('addNodeBtn').addEventListener('click', () => {
-            openModal('nodeModal');
-            
+            const modal = document.getElementById('nodeModal');
             const input = document.getElementById('nodeNameInput');
             const shapeSelect = document.getElementById('nodeShapeSelect');
             const title = document.getElementById('nodeModalTitle');
@@ -1468,16 +1536,27 @@
                 closeModal('nodeModal');
             };
             
-            document.getElementById('nodeModalOk').onclick = handleOk;
-            document.getElementById('nodeModalCancel').onclick = () => closeModal('nodeModal');
-            document.getElementById('closeNodeModal').onclick = () => closeModal('nodeModal');
-            
-            input.onkeypress = (e) => {
-                if (e.key === 'Enter') handleOk();
+            const handleCancel = () => {
+                closeModal('nodeModal');
             };
+            
+            // Remove existing listeners and add new ones
+            const okBtn = document.getElementById('nodeModalOk');
+            const cancelBtn = document.getElementById('nodeModalCancel');
+            const closeBtn = document.getElementById('closeNodeModal');
+            
+            okBtn.replaceWith(okBtn.cloneNode(true));
+            cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+            closeBtn.replaceWith(closeBtn.cloneNode(true));
+            
+            document.getElementById('nodeModalOk').onclick = handleOk;
+            document.getElementById('nodeModalCancel').onclick = handleCancel;
+            document.getElementById('closeNodeModal').onclick = handleCancel;
+            
+            openModal('nodeModal', false); // Don't auto-focus
         });
         
-        // Add Edge Mode
+        // Add Edge Mode - IMPROVED: Switch to preview on mobile
         document.getElementById('addEdgeBtn').addEventListener('click', () => {
             edgeMode = !edgeMode;
             firstNode = null;
@@ -1486,6 +1565,11 @@
             if (edgeMode) {
                 btn.classList.add('active');
                 showToast('Tap first node, then second node to create edge', 3000);
+                
+                // On mobile, switch to preview view
+                if (!isDesktop && currentView === 'editor') {
+                    switchView('preview');
+                }
             } else {
                 btn.classList.remove('active');
                 showToast('Edge mode cancelled');
@@ -1509,14 +1593,247 @@
         
         // Auto-render on code change with debounce
         let renderTimeout;
+        let urlUpdateTimeout;
         editor.on('change', () => {
             clearTimeout(renderTimeout);
-            renderTimeout = setTimeout(() => {
-                if (currentView === 'preview') {
-                    renderGraph();
-                }
-            }, 1000);
+            if (currentView === 'preview' || isDesktop) {
+                renderTimeout = setTimeout(renderGraph, 1000);
+            }
+            
+            // Update URL with debounce
+            clearTimeout(urlUpdateTimeout);
+            urlUpdateTimeout = setTimeout(updateURL, 1500);
         });
+        
+        // Export Button - opens export modal
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const modal = document.getElementById('exportModal');
+            
+            const handleOk = () => {
+                const filename = document.getElementById('exportFilename').value.trim() || 'graphviz-diagram';
+                const format = document.getElementById('exportFormat').value;
+                
+                if (format === 'svg') {
+                    exportSvg(filename);
+                } else {
+                    exportPng(filename);
+                }
+                
+                closeModal('exportModal');
+            };
+            
+            const handleCancel = () => {
+                closeModal('exportModal');
+            };
+            
+            // Remove existing listeners and add new ones
+            const okBtn = document.getElementById('exportModalOk');
+            const cancelBtn = document.getElementById('exportModalCancel');
+            const closeBtn = document.getElementById('closeExportModal');
+            
+            okBtn.replaceWith(okBtn.cloneNode(true));
+            cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+            closeBtn.replaceWith(closeBtn.cloneNode(true));
+            
+            document.getElementById('exportModalOk').onclick = handleOk;
+            document.getElementById('exportModalCancel').onclick = handleCancel;
+            document.getElementById('closeExportModal').onclick = handleCancel;
+            
+            openModal('exportModal');
+        });
+        
+        // Fixed PNG export for mobile
+        function exportSvg(filename = 'graphviz-diagram') {
+            if (!currentSvg) {
+                showToast('No graph to export');
+                return;
+            }
+            
+            try {
+                const blob = new Blob([currentSvg], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${filename}.svg`;
+                
+                // iOS Safari workaround
+                if (navigator.userAgent.match(/iPad|iPhone|iPod/) && navigator.userAgent.match(/AppleWebKit/)) {
+                    document.body.appendChild(a);
+                }
+                
+                a.click();
+                
+                setTimeout(() => {
+                    if (navigator.userAgent.match(/iPad|iPhone|iPod/) && navigator.userAgent.match(/AppleWebKit/)) {
+                        document.body.removeChild(a);
+                    }
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                showToast('SVG exported');
+            } catch (e) {
+                showToast('Export failed: ' + e.message, 3000);
+            }
+        }
+        
+        // Fixed PNG export for mobile
+        function exportPng(filename = 'graphviz-diagram') {
+            if (!currentSvg) {
+                showToast('No graph to export');
+                return;
+            }
+            
+            const svgElement = previewContent.querySelector('svg');
+            if (!svgElement) {
+                showToast('No SVG found');
+                return;
+            }
+            
+            try {
+                // Get SVG dimensions from viewBox or width/height attributes
+                const svgData = new XMLSerializer().serializeToString(svgElement);
+                
+                // Create a canvas with proper dimensions
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Parse SVG dimensions
+                const viewBox = svgElement.getAttribute('viewBox');
+                let width = parseInt(svgElement.getAttribute('width')) || 800;
+                let height = parseInt(svgElement.getAttribute('height')) || 600;
+                
+                if (viewBox) {
+                    const parts = viewBox.split(' ');
+                    if (parts.length >= 4) {
+                        width = parseInt(parts[2]) || width;
+                        height = parseInt(parts[3]) || height;
+                    }
+                }
+                
+                // Scale for better quality
+                const scale = 2;
+                canvas.width = width * scale;
+                canvas.height = height * scale;
+                ctx.scale(scale, scale);
+                
+                // Create image from SVG data
+                const img = new Image();
+                const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
+                
+                img.onload = () => {
+                    // Draw white background
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, width, height);
+                    
+                    // Draw SVG
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Create download link
+                    const pngUrl = canvas.toDataURL('image/png');
+                    const a = document.createElement('a');
+                    a.href = pngUrl;
+                    a.download = `${filename}.png`;
+                    
+                    // iOS Safari workaround
+                    if (navigator.userAgent.match(/iPad|iPhone|iPod/) && navigator.userAgent.match(/AppleWebKit/)) {
+                        document.body.appendChild(a);
+                    }
+                    
+                    a.click();
+                    
+                    setTimeout(() => {
+                        if (navigator.userAgent.match(/iPad|iPhone|iPod/) && navigator.userAgent.match(/AppleWebKit/)) {
+                            document.body.removeChild(a);
+                        }
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                    
+                    showToast('PNG exported');
+                };
+                
+                img.onerror = () => {
+                    showToast('Failed to load SVG for PNG export', 3000);
+                    URL.revokeObjectURL(url);
+                };
+                
+                img.src = url;
+            } catch (e) {
+                showToast('PNG export failed: ' + e.message, 3000);
+            }
+        }
+        
+        // Help Button - opens help modal
+        document.getElementById('helpBtn').addEventListener('click', () => {
+            const modal = document.getElementById('helpModal');
+            
+            const handleClose = () => {
+                closeModal('helpModal');
+            };
+            
+            // Remove existing listeners and add new ones
+            const closeBtn = document.getElementById('closeHelpModal');
+            const closeHelpBtn = document.getElementById('closeHelpBtn');
+            
+            closeBtn.replaceWith(closeBtn.cloneNode(true));
+            closeHelpBtn.replaceWith(closeHelpBtn.cloneNode(true));
+            
+            document.getElementById('closeHelpModal').onclick = handleClose;
+            document.getElementById('closeHelpBtn').onclick = handleClose;
+            
+            openModal('helpModal');
+        });
+        
+        // Share Button - generates shareable URL
+        shareBtn.addEventListener('click', () => {
+            const code = editor.getValue();
+            if (!code.trim()) {
+                showToast('Create a diagram first to share');
+                return;
+            }
+            
+            try {
+                // Create shareable URL
+                const base64Code = btoa(encodeURIComponent(code));
+                const shareUrl = `${window.location.origin}${window.location.pathname}#${base64Code}`;
+                // Copy to clipboard
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    showToast('Link copied to clipboard!');
+                });
+            } catch (e) {
+                showToast('Failed to create share link: ' + e.message, 3000);
+            }
+        });
+        
+        // Load code from URL hash
+        function loadFromURL() {
+            try {
+                const hash = window.location.hash.substring(1);
+                if (hash) {
+                    const decodedCode = decodeURIComponent(atob(hash));
+                    editor.setValue(decodedCode);
+                    showToast('Diagram loaded from URL');
+                    
+                    // Render immediately
+                    setTimeout(renderGraph, 500);
+                }
+            } catch (e) {
+                console.log('No valid diagram code in URL');
+            }
+        }
+        
+        // Update URL with current code
+        function updateURL() {
+            try {
+                const code = editor.getValue();
+                if (code.trim()) {
+                    const base64Code = btoa(encodeURIComponent(code));
+                    window.location.hash = base64Code;
+                }
+            } catch (e) {
+                console.log('Failed to update URL');
+            }
+        }
         
         // Menu Button Handlers
         
@@ -1570,7 +1887,7 @@
             });
         });
         
-        // Colorize
+        // Colorize with improved color scheme
         document.getElementById('colorizeBtn').addEventListener('click', () => {
             let code = editor.getValue();
             
@@ -1596,14 +1913,20 @@
                 }
             }
             
+            // Improved color scheme for diagrams
+            const getNodeColor = (inEdges, outEdges) => {
+                // Standard diagram colors
+                if (inEdges === 0 && outEdges > 0) return '#4ade80'; // Start node - green
+                if (inEdges > 0 && outEdges === 0) return '#f87171'; // End node - red
+                if (inEdges === outEdges && inEdges > 0) return '#fbbf24'; // Balanced - yellow
+                if (inEdges > outEdges) return '#60a5fa'; // More incoming - blue
+                if (outEdges > inEdges) return '#c084fc'; // More outgoing - purple
+                return '#d1d5db'; // Default - gray
+            };
+            
             // Color nodes based on connectivity
             nodes.forEach((stats, nodeName) => {
-                let color = 'lightgray';
-                if (stats.in === 0 && stats.out > 0) color = 'lightblue';
-                else if (stats.in > 0 && stats.out === 0) color = 'lightcoral';
-                else if (stats.in === stats.out && stats.in > 0) color = 'lightgreen';
-                else if (stats.in > stats.out) color = 'lightyellow';
-                else if (stats.out > stats.in) color = 'plum';
+                const color = getNodeColor(stats.in, stats.out);
                 
                 // Find and update node
                 const regex = new RegExp(`${nodeName}\\s*\\[([^\\]]*)\\]`);
@@ -1657,106 +1980,19 @@
             renderGraph();
         });
         
-        // Export Functions
-        document.getElementById('exportSvgBtn').addEventListener('click', exportSvg);
-        document.getElementById('exportPngBtn').addEventListener('click', exportPng);
-        document.getElementById('exportBtn').addEventListener('click', () => {
-            openModal('nodeModal'); // Reuse modal for export options
-            const modal = document.getElementById('nodeModal');
-            modal.innerHTML = `
-                <div class="modal-header">
-                    <div class="modal-title">Export Graph</div>
-                    <button class="close-modal" id="closeExportModal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div style="padding: 20px 0;">
-                    <button class="menu-btn" style="margin-bottom: 10px;" onclick="exportSvg()">
-                        <i class="fas fa-file-image"></i> Export as SVG
-                    </button>
-                    <button class="menu-btn" style="margin-bottom: 10px;" onclick="exportPng()">
-                        <i class="fas fa-file-image"></i> Export as PNG
-                    </button>
-                    <button class="menu-btn" id="copyCodeExportBtn">
-                        <i class="fas fa-copy"></i> Copy DOT Code
-                    </button>
-                </div>
-            `;
-            
-            document.getElementById('closeExportModal').onclick = () => closeModal('nodeModal');
-            document.getElementById('copyCodeExportBtn').onclick = copyCode;
+        // Export from menu
+        document.getElementById('exportSvgBtn').addEventListener('click', () => {
+            exportSvg();
+            closeMenu();
         });
         
-        function exportSvg() {
-            if (!currentSvg) {
-                showToast('No graph to export');
-                return;
-            }
-            
-            const blob = new Blob([currentSvg], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'graphviz-diagram.svg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showToast('SVG exported');
-            closeModal('nodeModal');
-        }
-        
-        function exportPng() {
-            if (!currentSvg) {
-                showToast('No graph to export');
-                return;
-            }
-            
-            const svgElement = previewContent.querySelector('svg');
-            if (!svgElement) {
-                showToast('No SVG found');
-                return;
-            }
-            
-            const svgData = new XMLSerializer().serializeToString(svgElement);
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Get SVG dimensions
-            const bbox = svgElement.getBBox();
-            canvas.width = bbox.width + 40;
-            canvas.height = bbox.height + 40;
-            
-            const img = new Image();
-            const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(svgBlob);
-            
-            img.onload = () => {
-                ctx.fillStyle = '#0f172a';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 20, 20);
-                
-                const pngUrl = canvas.toDataURL('image/png');
-                const a = document.createElement('a');
-                a.href = pngUrl;
-                a.download = 'graphviz-diagram.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showToast('PNG exported');
-                closeModal('nodeModal');
-            };
-            
-            img.src = url;
-        }
+        document.getElementById('exportPngBtn').addEventListener('click', () => {
+            exportPng();
+            closeMenu();
+        });
         
         // Copy Code
-        document.getElementById('copyCodeBtn').addEventListener('click', copyCode);
-        
-        function copyCode() {
+        document.getElementById('copyCodeBtn').addEventListener('click', () => {
             const code = editor.getValue();
             navigator.clipboard.writeText(code).then(() => {
                 showToast('DOT code copied to clipboard');
@@ -1764,7 +2000,7 @@
             }).catch(err => {
                 showToast('Failed to copy: ' + err);
             });
-        }
+        });
         
         // Examples
         document.querySelectorAll('[data-example]').forEach(btn => {
@@ -1778,13 +2014,13 @@
     rankdir=TB;
     node [shape=box, style=rounded];
     
-    Start [shape=circle];
-    Input [label="Get Input"];
-    Process [label="Process Data"];
-    Decision [shape=diamond, label="Valid?"];
-    Error [shape=box, fillcolor=lightcoral];
-    Output [label="Show Result"];
-    End [shape=circle];
+    Start [shape=circle, fillcolor="#4ade80"];
+    Input [label="Get Input", fillcolor="#60a5fa"];
+    Process [label="Process Data", fillcolor="#60a5fa"];
+    Decision [shape=diamond, label="Valid?", fillcolor="#fbbf24"];
+    Error [shape=box, fillcolor="#f87171"];
+    Output [label="Show Result", fillcolor="#60a5fa"];
+    End [shape=circle, fillcolor="#f87171"];
     
     Start -> Input;
     Input -> Process;
@@ -1799,17 +2035,17 @@
                     case 'hierarchy':
                         code = `digraph hierarchy {
     rankdir=TB;
-    node [shape=box, style=filled, fillcolor=lightblue];
+    node [shape=box, style=filled];
     
-    CEO [shape=box, fillcolor=lightyellow];
+    CEO [fillcolor="#fbbf24"];
     
-    CTO [label="CTO\\nTech Lead"];
-    CFO [label="CFO\\nFinance"];
-    COO [label="COO\\nOperations"];
+    CTO [label="CTO\\nTech Lead", fillcolor="#60a5fa"];
+    CFO [label="CFO\\nFinance", fillcolor="#4ade80"];
+    COO [label="COO\\nOperations", fillcolor="#c084fc"];
     
-    Dev1 [label="Dev Team\\nLead"];
-    Dev2 [label="Senior\\nDeveloper"];
-    Dev3 [label="Junior\\nDeveloper"];
+    Dev1 [label="Dev Team\\nLead", fillcolor="#60a5fa"];
+    Dev2 [label="Senior\\nDeveloper", fillcolor="#4ade80"];
+    Dev3 [label="Junior\\nDeveloper", fillcolor="#c084fc"];
     
     CEO -> CTO;
     CEO -> CFO;
@@ -1827,16 +2063,16 @@
     node [shape=circle, style=filled];
     edge [color="#666666"];
     
-    Router [shape=box, fillcolor=lightyellow];
+    Router [shape=box, fillcolor="#fbbf24"];
     
-    Server1 [fillcolor=lightblue];
-    Server2 [fillcolor=lightblue];
-    Server3 [fillcolor=lightblue];
+    Server1 [fillcolor="#60a5fa"];
+    Server2 [fillcolor="#60a5fa"];
+    Server3 [fillcolor="#60a5fa"];
     
-    Client1 [fillcolor=lightgreen];
-    Client2 [fillcolor=lightgreen];
-    Client3 [fillcolor=lightgreen];
-    Client4 [fillcolor=lightgreen];
+    Client1 [fillcolor="#4ade80"];
+    Client2 [fillcolor="#4ade80"];
+    Client3 [fillcolor="#4ade80"];
+    Client4 [fillcolor="#4ade80"];
     
     Router -> Server1;
     Router -> Server2;
@@ -1857,75 +2093,19 @@
             });
         });
         
-        // Help Button
-        document.getElementById('helpBtn').addEventListener('click', () => {
-            openModal('nodeModal');
-            const modal = document.getElementById('nodeModal');
-            modal.innerHTML = `
-                <div class="modal-header">
-                    <div class="modal-title">Help & Tips</div>
-                    <button class="close-modal" id="closeHelpModal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div style="padding: 20px 0; color: #94a3b8; line-height: 1.6;">
-                    <h4 style="color: white; margin-bottom: 10px;">Quick Start</h4>
-                    <p>1. Edit DOT code in the Code tab</p>
-                    <p>2. Switch to Preview to see the graph</p>
-                    <p>3. Tap nodes in preview to edit them</p>
-                    <p>4. Use bottom buttons to add elements</p>
-                    
-                    <h4 style="color: white; margin: 20px 0 10px 0;">Mobile Tips</h4>
-                    <p>• Pinch to zoom in preview</p>
-                    <p>• Use code toolbar for quick inserts</p>
-                    <p>• Menu has layout and export options</p>
-                    <p>• Works offline once loaded</p>
-                    
-                    <h4 style="color: white; margin: 20px 0 10px 0;">DOT Basics</h4>
-                    <p><code>digraph G { ... }</code> - Directed graph</p>
-                    <p><code>A -> B;</code> - Edge from A to B</p>
-                    <p><code>A [shape=box];</code> - Node attributes</p>
-                    <p><code>rankdir=LR;</code> - Left to right layout</p>
-                </div>
-                <div class="modal-actions">
-                    <button class="modal-btn primary" id="closeHelpBtn">Got it!</button>
-                </div>
-            `;
-            
-            document.getElementById('closeHelpModal').onclick = () => closeModal('nodeModal');
-            document.getElementById('closeHelpBtn').onclick = () => closeModal('nodeModal');
-        });
-        
-        // Handle orientation changes
-        window.addEventListener('orientationchange', () => {
-            setTimeout(() => {
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            initViewMode();
+            if (editor) {
                 editor.refresh();
-                if (currentView === 'preview') {
-                    updatePreviewZoom();
-                }
-            }, 300);
+            }
         });
         
-        // Prevent accidental zoom with double-tap
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', (event) => {
-            const now = Date.now();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, { passive: false });
-        
-        // Initialize view
+        // Initialize
         setTimeout(() => {
-            switchView('editor');
+            initViewMode();
             showToast('Welcome to Graphviz Editor!', 3000);
         }, 500);
-        
-        // Make functions available globally for inline handlers
-        window.exportSvg = exportSvg;
-        window.exportPng = exportPng;
-        window.copyCode = copyCode;
     </script>
 </body>
 </html>
