@@ -4,5 +4,5 @@
 
 ## Subpages
 
-- [Graphvizor](https://anrinion.ansid.de/graphvizor)
+- [Graphvizor](https://anrinion.ansid.de/graphvizor) *Note: this has been moved to https://github.com/anrinion/graphvizor, but I'll keep hosting it in case someone actually uses the old version*
 
