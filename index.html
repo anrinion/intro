@@ -1,67 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anrinion's Nest</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Anrinion’s Nest</title>
     <link rel="stylesheet" href="style.css">
-    <script>
-        function switchLang(lang) {
-            document.getElementById('content-ru').style.display = lang === 'ru' ? 'block' : 'none';
-            document.getElementById('content-en').style.display = lang === 'en' ? 'block' : 'none';
-            document.getElementById('content-de').style.display = lang === 'de' ? 'block' : 'none';
-            document.getElementById('modal-ru').style.display = lang === 'ru' ? 'block' : 'none';
-            document.getElementById('modal-en').style.display = lang === 'en' ? 'block' : 'none';
-            document.getElementById('modal-de').style.display = lang === 'de' ? 'block' : 'none';
-            document.getElementById('site-title').textContent = lang === 'ru' ? 'Гнездо Анриниона' : lang === 'de' ? 'Anrinions Nest' : "Anrinion's Nest";
-        }
-        
-        document.addEventListener("DOMContentLoaded", function() {
-            switchLang('en');
-        });
-
-        function showModal() {
-            document.getElementById('contact-modal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('contact-modal').style.display = 'none';
-        }
-    </script>
 </head>
+
 <body>
-    <div class="container">
-        <h1 id="site-title">Anrinion's Nest</h1>
-        <div class="contacts">
-            <p><a href="https://bsky.app/profile/anrinion.ansid.de">Bluesky</a> | <a href="mailto:neocites_incoming.annotate085@passmail.com">Email</a> | <a href="https://www.instagram.com/anrinion">Instagram</a> | <a onclick="showModal()">Telegram / LinkedIn</a></p>
+    <div class="wrapper">
+        <div class="top-bar">
+            <h1 id="site-title">Anrinion's Nest</h1>
+            <button class="theme-toggle-btn" id="themeToggle" aria-label="Switch theme">light / dark</button>
         </div>
-        <div class="lang-switch">
-            <button onclick="switchLang('ru')">🇷🇺 Русский</button>
-            <button onclick="switchLang('en')">🇬🇧 English</button>
-            <button onclick="switchLang('de')">🇩🇪 Deutsch</button>
+
+        <!-- contacts with LinkedIn visible, Telegram modal -->
+        <div class="contact-bar">
+            <a href="https://bsky.app/profile/anrinion.ansid.de" target="_blank">Bluesky</a>
+            <a href="mailto:anrinion.web@mail.ansid.de">Email</a>
+            <a href="https://www.instagram.com/anrinion" target="_blank">Instagram</a>
+            <a href="https://www.linkedin.com/in/ansid/" target="_blank" rel="noopener">LinkedIn</a>
+            <a class="telegram-link" onclick="showModal()">Telegram</a>
         </div>
-         <div id="content-ru" style="display: none;">
-            <p>Привет, я Анри! Физик, программист, студент-психолог. Люблю горы, кофе и фантастику.</p>
+
+        <!-- Language switch (flags only) -->
+        <div class="lang-bar">
+            <button class="lang-btn" onclick="switchLang('ru')">🇷🇺 Русский</button>
+            <button class="lang-btn" onclick="switchLang('en')">🇬🇧 English</button>
+            <button class="lang-btn" onclick="switchLang('de')">🇩🇪 Deutsch</button>
         </div>
-        <div id="content-en">
-            <p>Hi, I'm Anri! Physicist, programmer, psychology student. I love mountains, coffee, and sci-fi.</p>
+
+        <!-- Intro multilingual -->
+        <div class="intro-card">
+            <div id="content-ru" style="display: none;">
+                <p>Привет, я Анри. Физик, программист, студент-психолог.</p>
+            </div>
+            <div id="content-en">
+                <p>Hi, I'm Anri. Physicist, programmer, psychology student.</p>
+            </div>
+            <div id="content-de" style="display: none;">
+                <p>Hallo, ich bin Anri. Physiker, Programmierer, Psychologiestudent.
+                </p>
+            </div>
+
+            <!-- Cat image -->
+            <img src="cat.jpg" alt="Cozy corner with a cat" class="profile-pic">
         </div>
-        <div id="content-de" style="display: none;">
-            <p>Hallo, ich bin Anri! Physiker, Programmierer, Psychologiestudent. Ich liebe Berge, Kaffee und Sci-Fi.</p>
+
+        <!-- Hobbies / interests -->
+        <div style="margin: 2rem 0 1rem;">
+            <h2>Hobbies & other</h2>
+            <ul style="font-size: 1.15rem; list-style-type: '→ '; padding-left: 1.8rem; color: var(--text-primary);">
+                <li style="margin-bottom: 0.4rem;">Mountains & hiking</li>
+                <li style="margin-bottom: 0.4rem;">Coffee (Aeropress, v60)</li>
+                <li style="margin-bottom: 0.4rem;">Science fiction (books & movies)</li>
+                <li style="margin-bottom: 0.4rem;">3D printing —
+                    <a href="https://makerworld.com/en/@user_2092855204/profile" target="_blank"
+                        style="color: var(--accent);">Makerworld</a>
+                </li>
+            </ul>
         </div>
-        <div>
-          <img src="cat.jpg" class="main-image" alt="">
+
+        <!-- PROJECTS SECTION -->
+        <h2>Projects</h2>
+
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 0.8rem;">
+            <button id="expandAllBtn" class="lang-btn" style="padding: 0.4rem 1.2rem;">Expand all</button>
+        </div>
+        <div class="projects-grid">
+            <!-- baseline -->
+            <div class="project-card">
+                <details>
+                    <summary>
+                        <span class="project-name">Baseline</span>
+                        <span class="project-links"><a href="https://github.com/anrinion/baseline"
+                                target="_blank">GitHub</a></span>
+                    </summary>
+                    <div class="project-description">
+                        <p><strong>Description:</strong> Mobile self-care app</p>
+                        <p><strong>Published / Hosted:</strong> APK releases on <a
+                                href="https://github.com/anrinion/baseline/releases" target="_blank">GitHub</a></p>
+                    </div>
+                </details>
+            </div>
+            <!-- shopping-pad -->
+            <div class="project-card">
+                <details>
+                    <summary>
+                        <span class="project-name">shopping-pad</span>
+                        <span class="project-links"><a href="https://github.com/anrinion/shopping-pad"
+                                target="_blank">GitHub</a></span>
+                    </summary>
+                    <div class="project-description">
+                        <p><strong>Description:</strong> Plugin/script for fighting Amazon shopping behavior</p>
+                        <p><strong>Published / Hosted:</strong> <a
+                                href="https://chromewebstore.google.com/detail/shoppingpad-for-amazon/fgfdkmckgeiabncibdhipaiekfkdfknj"
+                                target="_blank">Chrome Web Store</a>, <a
+                                href="https://greasyfork.org/en/scripts/571851-shoppingpad" target="_blank">Greasy
+                                Fork</a></p>
+                    </div>
+                </details>
+            </div>
+            <!-- aliexpress-filter -->
+            <div class="project-card">
+                <details>
+                    <summary>
+                        <span class="project-name">aliexpress-filter</span>
+                        <span class="project-links"><a href="https://github.com/anrinion/aliexpress-filter"
+                                target="_blank">GitHub</a></span>
+                    </summary>
+                    <div class="project-description">
+                        <p><strong>Description:</strong> Tampermonkey script to hide low-rated, low-vote and promo junk
+                            on AliExpress.</p>
+                        <p><strong>Published / Hosted:</strong> <a
+                                href="https://greasyfork.org/en/scripts/561248-aliexpress-filter" target="_blank">Greasy
+                                Fork</a></p>
+                    </div>
+                </details>
+            </div>
+            <!-- intro -->
+            <div class="project-card">
+                <details>
+                    <summary>
+                        <span class="project-name">intro</span>
+                        <span class="project-links"><a href="https://github.com/anrinion/intro"
+                                target="_blank">GitHub</a></span>
+                    </summary>
+                    <div class="project-description">
+                        <p><strong>Description:</strong> This page</p>
+                        <p><strong>Published / Hosted:</strong> Right here! (Cloudflare Pages underneath) </p>
+                    </div>
+                </details>
+            </div>
+            <!-- graphvizor -->
+            <div class="project-card">
+                <details>
+                    <summary>
+                        <span class="project-name">graphvizor</span>
+                        <span class="project-links"><a href="https://github.com/anrinion/graphvizor"
+                                target="_blank">GitHub</a></span>
+                    </summary>
+                    <div class="project-description">
+                        <p><strong>Description:</strong> A simple Graphviz visualizer, web, mobile-friendly</p>
+                        <p><strong>Published / Hosted:</strong> <a href="https://graphvizor.ansid.de"
+                                target="_blank">graphvizor.ansid.de</a></p>
+                    </div>
+                </details>
+            </div>
+            <!-- yt-purifier -->
+            <div class="project-card">
+                <details>
+                    <summary>
+                        <span class="project-name">yt-purifier</span>
+                        <span class="project-links"><a href="https://github.com/anrinion/yt-purifier"
+                                target="_blank">GitHub</a></span>
+                    </summary>
+                    <div class="project-description">
+                        <p><strong>Description:</strong> Tampermonkey script to filter YouTube home page</p>
+                        <p><strong>Published / Hosted:</strong> <a
+                                href="https://greasyfork.org/en/scripts/561303-youtube-feed-purifier"
+                                target="_blank">Greasy Fork</a></p>
+                    </div>
+                </details>
+            </div>
+            <!-- huawei-watchfaces -->
+            <div class="project-card">
+                <details>
+                    <summary>
+                        <span class="project-name">huawei-watchfaces</span>
+                        <span class="project-links"><a href="https://github.com/anrinion/huawei-watchfaces"
+                                target="_blank">GitHub</a></span>
+                    </summary>
+                    <div class="project-description">
+                        <p><strong>Description:</strong> Custom watch faces for Huawei smartwatches (Fit 3/4, GT6, Band
+                            9/10) </p>
+                        <p><strong>Published / Hosted:</strong> Not published — GitHub only.</p>
+                    </div>
+                </details>
+            </div>
+            <!-- aliexpress-desaturator -->
+            <div class="project-card">
+                <details>
+                    <summary>
+                        <span class="project-name">aliexpress-desaturator</span>
+                        <span class="project-links"><a href="https://github.com/anrinion/aliexpress-desaturator"
+                                target="_blank">GitHub</a></span>
+                    </summary>
+                    <div class="project-description">
+                        <p><strong>Description:</strong> Tampermonkey script that desaturates AliExpress to reduce
+                            visual clutter.</p>
+                        <p><strong>Published / Hosted:</strong> Not published — GitHub only.</p>
+                    </div>
+                </details>
+            </div>
+            <!-- googlify-kagi-theme -->
+            <div class="project-card">
+                <details>
+                    <summary>
+                        <span class="project-name">googlify-kagi-theme</span>
+                        <span class="project-links"><a href="https://github.com/anrinion/googlify-kagi-theme"
+                                target="_blank">GitHub</a></span>
+                    </summary>
+                    <div class="project-description">
+                        <p><strong>Description:</strong> A theme for Kagi Search that makes it look more like Google.
+                        </p>
+                        <p><strong>Published / Hosted:</strong> Not published — GitHub only.</p>
+                    </div>
+                </details>
+            </div>
+            <!-- adblock -->
+            <div class="project-card">
+                <details>
+                    <summary>
+                        <span class="project-name">adblock</span>
+                        <span class="project-links"><a href="https://github.com/anrinion/adblock"
+                                target="_blank">GitHub</a></span>
+                    </summary>
+                    <div class="project-description">
+                        <p><strong>Description:</strong> A browser extension that removes sponsorships and unrelated
+                            links from YouTube video descriptions with multiple AI backend support.</p>
+                        <p><strong>Published / Hosted:</strong> <a
+                                href="https://chromewebstore.google.com/detail/youtube-description-rewri/bkifbmkpjodnagcldhlonpegnfolnlin"
+                                target="_blank">Chrome Web Store</a></p>
+                    </div>
+                </details>
+            </div>
+            <!-- ru-de-a1 -->
+            <div class="project-card">
+                <details>
+                    <summary>
+                        <span class="project-name">ru-de-a1</span>
+                        <span class="project-links"><a href="https://github.com/anrinion/ru-de-a1"
+                                target="_blank">GitHub</a></span>
+                    </summary>
+                    <div class="project-description">
+                        <p><strong>Description:</strong> Learning tool for Russian-German vocabulary, web-based.</p>
+                        <p><strong>Published / Hosted:</strong> <a href="https://ru-de-a1.pages.dev"
+                                target="_blank">ru-de-a1.pages.dev</a></p>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- Updates section -->
+        <h2>Updates</h2>
+        <div class="updates-card">
+            <div class="update-item">
+                <span class="update-date" id="todayDate"></span>
+                <span class="update-text">Redesign: style, theme switcher, projects, and mobile polish.</span>
+            </div>
+        </div>
+
+
+        <div class="footer">
+            Hosted by Cloudflare Pages · 2025-<span id="currentYear"></span><br>
+            Code generated by DeepSeek, content hand-written.
         </div>
     </div>
-    <div id="contact-modal" class="modal">
-        <p id="modal-ru" style="display: none;">Если вам нужен мой Telegram или у вас есть профессиональный запрос, пожалуйста, напишите мне на почту.</p>
-        <p id="modal-en">If you need my Telegram or want to contact me for professional inquiries, please send me an email.</p>
-        <p id="modal-de" style="display: none;">Wenn Sie mein Telegram benötigen oder mich für berufliche Anfragen kontaktieren möchten, senden Sie mir bitte eine E-Mail.</p>
-        <button onclick="closeModal()">Close</button>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="contact-modal">
+        <div class="modal-card">
+            <p id="modal-ru" style="display: none;">Для Telegram или делового запроса — напишите на почту.</p>
+            <p id="modal-en">For Telegram or professional inquiries, please send an email.</p>
+            <p id="modal-de" style="display: none;">Für Telegram oder berufliche Anfragen bitte eine E-Mail senden.</p>
+            <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
     </div>
-    <div class="footer">
-        Hosted by Cloudflare Pages | Created in 2025 - <script>document.write(new Date().getFullYear());</script><br>
-        Code generated by ChatGPT, all text and images are hand-written.
-    </div>
+
+    <script>
+        (function () {
+            // ----- THEME HANDLING (browser pref + toggle) -----
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+
+            function setTheme(theme) {
+                if (theme === 'light') {
+                    body.classList.add('light-theme');
+                    body.classList.remove('dark-theme');
+                } else {
+                    body.classList.add('dark-theme');
+                    body.classList.remove('light-theme');
+                }
+                localStorage.setItem('anri-theme', theme);
+            }
+
+            function getPreferredTheme() {
+                const saved = localStorage.getItem('anri-theme');
+                if (saved === 'light' || saved === 'dark') return saved;
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function applyTheme() {
+                setTheme(getPreferredTheme());
+            }
+            applyTheme();
+
+            themeToggle.addEventListener('click', () => {
+                const current = body.classList.contains('dark-theme') ? 'dark' : 'light';
+                setTheme(current === 'dark' ? 'light' : 'dark');
+            });
+
+            // listen to system changes if no manual override
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem('anri-theme')) {
+                    setTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+
+            function expandAllProjects(expand) {
+                const grid = document.querySelector('.projects-grid');
+                if (!grid) return;
+                const details = grid.querySelectorAll('details');
+                details.forEach(d => d.open = expand);
+            }
+
+            // Hook up the button
+            document.addEventListener('DOMContentLoaded', function () {
+                const btn = document.getElementById('expandAllBtn');
+                if (btn) {
+                    btn.addEventListener('click', function () {
+                        const grid = document.querySelector('.projects-grid');
+                        const details = grid.querySelectorAll('details');
+                        // Check if any are closed – if so, expand all; otherwise collapse all (toggle behaviour)
+                        const anyClosed = Array.from(details).some(d => !d.open);
+                        details.forEach(d => d.open = anyClosed);
+                        btn.textContent = anyClosed ? 'Collapse all' : 'Expand all';
+                    });
+                }
+            });
+
+            // ----- LANGUAGE SWITCH -----
+            window.switchLang = function (lang) {
+                document.getElementById('content-ru').style.display = lang === 'ru' ? 'block' : 'none';
+                document.getElementById('content-en').style.display = lang === 'en' ? 'block' : 'none';
+                document.getElementById('content-de').style.display = lang === 'de' ? 'block' : 'none';
+                document.getElementById('modal-ru').style.display = lang === 'ru' ? 'block' : 'none';
+                document.getElementById('modal-en').style.display = lang === 'en' ? 'block' : 'none';
+                document.getElementById('modal-de').style.display = lang === 'de' ? 'block' : 'none';
+                const title = document.getElementById('site-title');
+                if (lang === 'ru') title.textContent = 'Гнездо Анриниона';
+                else if (lang === 'de') title.textContent = 'Anrinions Nest';
+                else title.textContent = "Anrinion's Nest";
+            };
+
+            // ----- MODAL -----
+            window.showModal = function () {
+                document.getElementById('contact-modal').style.display = 'flex';
+            };
+            window.closeModal = function () {
+                document.getElementById('contact-modal').style.display = 'none';
+            };
+            document.getElementById('contact-modal').addEventListener('click', function (e) {
+                if (e.target === this) closeModal();
+            });
+
+            // ----- set today's date -----
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('todayDate').textContent = today.toLocaleDateString('en-US', options);
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            // default language english
+            window.switchLang('en');
+        })();
+    </script>
 </body>
+
 </html>
