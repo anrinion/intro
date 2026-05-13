@@ -1,6 +1,4 @@
 baseURL: https://anrinion.ansid.de/
-locale: en-us
-title: Anrinion’s Nest
 theme: ["PaperMod"]
 
 enableRobotsTXT: true
@@ -12,14 +10,11 @@ minify:
   disableXML: true
   minifyOutput: true
 
+# Only params shared across all locales
 params:
   env: production
-  title: Anrinion’s Nest
-  description: "Random stuff from @anrinion"
   keywords: [Blog, Anri, anrinion]
   author: anrinion
-  # images: ["<link or path of image for opengraph, twitter-cards>"]
-  DateFormat: "2 January 2006"
   defaultTheme: auto # dark, light
   disableThemeToggle: false
 
@@ -39,23 +34,6 @@ params:
   showtoc: false
   tocopen: false
 
-  label:
-    text: "Home"
-
-  # profile-mode
-  profileMode:
-    enabled: true # needs to be explicitly set
-    subtitle: "Hello there! I'm Anri - a physicist, a software engineer, and a psychology student."
-    imageUrl: "/cat.jpg"
-    imageWidth: 224
-    imageHeight: 124
-    imageTitle: A cat
-    buttons:
-      - name: Read my blog
-        url: posts
-      - name: Check out projects
-        url: projects
-
   socialIcons:
     - name: bluesky
       url: "https://bsky.app/profile/anrinion.ansid.de"
@@ -73,26 +51,6 @@ params:
     hiddenInList: true # hide on list pages and home
     hiddenInSingle: true # hide on single page
 
-  editPost:
-    URL: "https://github.com/anrinion/intro/blog/content"
-    Text: "Suggest Changes" # edit text
-    appendFilePath: true # to append file path to Edit link
-
-menu:
-  main:
-    - identifier: posts
-      name: posts
-      url: /posts/
-      weight: 10
-    - identifier: projects
-      name: projects
-      url: /projects/
-      weight: 20
-    - identifier: about
-      name: about me
-      url: /about/
-      weight: 30
-
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: true
 markup:
@@ -103,3 +61,97 @@ markup:
     guessSyntax: true
     lineNos: true
     style: monokai
+
+defaultContentLanguage: en
+defaultContentLanguageInSubdir: true
+disableDefaultLanguageRedirect: true
+languages:
+  en:
+    contentDir: content/en
+    label: English
+    locale: en-US
+    weight: 0
+
+    # Language-specific overrides
+    title: Anrinion’s Nest
+    params:
+      description: "Random stuff from @anrinion"
+      DateFormat: "January 2, 2006"
+      label:
+        text: "Home"
+
+      # profile-mode
+      profileMode:
+        enabled: true # needs to be explicitly set
+
+        subtitle: "Hello there! I'm Anri - a physicist, a software engineer, and a psychology student."
+        imageUrl: "/cat.jpg"
+        imageWidth: 224
+        imageHeight: 124
+        imageTitle: A cat
+        buttons:
+          - name: Read my blog
+            url: posts
+          - name: Check out projects
+            url: projects
+    menu:
+      main:
+        - identifier: posts
+          name: posts
+          url: /posts/
+          weight: 10
+        - identifier: projects
+          name: projects
+          url: /projects/
+          weight: 20
+        - identifier: about
+          name: about me
+          url: /about/
+          weight: 30
+
+  ru:
+    contentDir: content/ru
+    label: Русский
+    locale: ru-RU
+    weight: 1
+
+    # Language-specific overrides
+    title: Гнездо Анриниона
+    params:
+      description: "Random stuff from @anrinion"
+      DateFormat: "January 2, 2006"
+      label:
+        text: "Главная"
+
+      # profile-mode
+      profileMode:
+        enabled: true # needs to be explicitly set
+
+        subtitle: "Привет! Я Анри - физик, разработчик, учусь на психолога."
+        imageUrl: "/cat.jpg"
+        imageWidth: 224
+        imageHeight: 124
+        imageTitle: A cat
+        buttons:
+          - name: Почитать блог
+            url: /ru/posts
+          - name: Посмотреть проекты
+            url: /en/projects
+    menu:
+      main:
+        - identifier: posts (ru)
+          name: блог
+          url: posts
+          weight: 5
+        - identifier: posts (en)
+          name: блог (англ.)
+          url: ../en/posts/
+          weight: 10
+        - identifier: projects (en)
+          name: проекты (англ.)
+          url: ../en/projects/
+          weight: 20
+        - identifier: about (ru)
+          name: о себе
+          url: about
+          weight: 30
