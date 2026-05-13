@@ -1,5 +1,5 @@
 baseURL: https://anrinion.ansid.de/
-theme: ["PaperMod"]
+theme: "PaperMod"
 
 enableRobotsTXT: true
 buildDrafts: false
@@ -8,7 +8,7 @@ buildExpired: false
 
 minify:
   disableXML: true
-  minifyOutput: false
+  minifyOutput: true
 
 # Only params shared across all locales
 params:
@@ -67,7 +67,7 @@ markup:
 
 defaultContentLanguage: en
 defaultContentLanguageInSubdir: true
-disableDefaultLanguageRedirect: true
+disableDefaultLanguageRedirect: false
 languages:
   en:
     contentDir: content/en
