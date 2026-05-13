@@ -29,7 +29,8 @@ git submodule add --depth=1 https://github.com/adityatelange/hugo-PaperMod.git b
 ```
 hugo server --buildDrafts
 ```
-- move existing static content (images, robots.txt) to `blog/static`
+- move existing static content (images) to `blog/static`
+- move robots.txt to `blog/layouts/robots.txt`
 - re-create existing static pages as markdown (one page in my case, `blog/content/about.md`) or as posts.
 - change Cloudflare deployment settings: build command `hugo`, root directory `blog`, build output `public`
 - set `HUGO_VERSION` variable to `0.161.1` (my current Hugo version; the point is to set the minimum required version as Cloudflare's default is too old)
