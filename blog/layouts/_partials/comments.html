@@ -1,0 +1,36 @@
+<div class="post-meta">
+    <h2>Comments section</h2>
+
+    If you don't see comments below, they are likely blocked by your ad blocker
+    - please authorize scripts from `utteranc.es`.
+
+    <div id="utterances-container"></div>
+</div>
+
+<script>
+    function getTheme() {
+        const stored = localStorage.getItem("pref-theme");
+        if (stored === "dark") return "github-dark";
+        if (stored === "light") return "github-light";
+        return window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "github-dark"
+            : "github-light";
+    }
+
+    function loadUtterances() {
+        const script = document.createElement("script");
+        script.src = "https://utteranc.es/client.js";
+        script.setAttribute("repo", "anrinion/intro");
+        script.setAttribute("issue-term", "pathname");
+        script.setAttribute("theme", getTheme());
+        script.setAttribute("crossorigin", "anonymous");
+        script.async = true;
+
+        const container = document.getElementById("utterances-container");
+        if (!container) return;
+        container.innerHTML = "";
+        container.appendChild(script);
+    }
+
+    loadUtterances();
+</script>
