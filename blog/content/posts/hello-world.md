@@ -25,10 +25,14 @@ git submodule add --depth=1 https://github.com/adityatelange/hugo-PaperMod.git b
 ```
 - set `theme: ["PaperMod"]` in `hugo.yaml`
 - configure everything in `hugo.yaml` (using [sample](https://github.com/adityatelange/hugo-PaperMod/wiki/Installation#sample-hugoyml))
-- start `hugo server` to preview changes
+- start live server to preview changes
+```
+hugo server --buildDrafts
+```
 - move existing static content (images, robots.txt) to `blog/static`
 - re-create existing static pages as markdown (one page in my case, `blog/content/about.md`) or as posts.
-- change Cloudflare deployment settings: build command `hugo`, root directory `blog`, build output `public`, set `HUGO_VERSION` variable to `0.161.1`
+- change Cloudflare deployment settings: build command `hugo`, root directory `blog`, build output `public`
+- set `HUGO_VERSION` variable to `0.161.1` (my current Hugo version; the point is to set the minimum required version as Cloudflare's default is too old)
 
 ## Resources:
 - [Hugo Quick Start](https://gohugo.io/getting-started/quick-start/)
