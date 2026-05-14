@@ -14,6 +14,7 @@ minify:
 params:
   env: production
   keywords: [Blog, Anri, anrinion]
+  images: ["/og-default.png"]
   author: anrinion
   defaultTheme: auto # dark, light
   disableThemeToggle: false
@@ -76,9 +77,9 @@ languages:
     weight: 0
 
     # Language-specific overrides
-    title: Anrinion’s Nest
+    title: Anrinion Nest
     params:
-      description: "Random stuff from @anrinion"
+      description: "@anrinion personal blog"
       DateFormat: "January 2, 2006"
       label:
         text: "Home"
@@ -121,8 +122,8 @@ languages:
     # Language-specific overrides
     title: Гнездо Анриниона
     params:
-      description: "Random stuff from @anrinion"
-      DateFormat: "January 2, 2006"
+      description: "Блог @anrinion"
+      DateFormat: "2 January 2006"
       label:
         text: "Главная"
 
